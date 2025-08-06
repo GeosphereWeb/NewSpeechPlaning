@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NEW Speech Planing</string>
+    <string name="CIRCUIT_ASSEMBLY_WITH_CIRCUIT_OBSERVER">Kreiskongress mit dem Kreisaufseher</string>
+    <string name="CIRCUIT_OVERSEER_CONGREGATION_VISIT">Versammlungsbesuch des Kreisaufsehers</string>
+    <string name="CONVENTION">Regionaler Kongress</string>
+    <string name="MEMORIAL">Abendmahl</string>
+    <string name="SPECIAL_LECTURE">Sondervortrag</string>
+    <string name="MISCELLANEOUS">Sonstiges</string>
+    <string name="MINISTERIAL_SERVANT">Dienstamtgehilfe</string>
+    <string name="ELDER">Ältester</string>
+    <string name="UNKNOWN">Unbekannt</string>
+    <string name="ACTIVE">aktiv</string>
+    <string name="cancel_lbl">abbrechen</string>
+    <string name="ok_lbl">OK</string>
+</resources>
