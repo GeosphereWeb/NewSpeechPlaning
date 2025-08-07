@@ -1,4 +1,5 @@
 import com.android.build.api.dsl.Packaging
+import org.gradle.kotlin.dsl.testImplementation
 
 plugins {
     alias(libs.plugins.android.application)
@@ -12,7 +13,7 @@ plugins {
 
 android {
     namespace = "de.geosphere.speechplaning"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "de.geosphere.speechplaning"
@@ -97,17 +98,16 @@ dependencies {
     detektPlugins(libs.detekt.formatting)
 
     testImplementation(kotlin("test"))
-    // testImplementation(libs.mockk)
-    // testImplementation(libs.junit)
+
     // JUnit 5
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
     testImplementation(libs.junit.jupiter.params)
+
     // Für parametrisierte Tests
-    // Mockito
-    testImplementation(libs.mockito.core)
-    testImplementation(libs.mockito.kotlin)
-    // Kotlin-freundliche Mockito-Erweiterungen
+    // Mockk
+    testImplementation(libs.mockk.android)
+    testImplementation(libs.mockk.agent)
     // Kotlin Coroutines Test
     testImplementation(libs.kotlinx.coroutines.test)
     // Version anpassen
