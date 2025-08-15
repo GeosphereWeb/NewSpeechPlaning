@@ -1,0 +1,30 @@
+
+# Tells tools to stop searching upwards.
+root = true
+
+[*.{kt,kts}]
+ij_kotlin_line_comment_at_first_column = false
+ij_kotlin_line_comment_add_space = true
+ij_kotlin_keep_blank_lines_in_declarations = 1
+ij_kotlin_keep_blank_lines_in_code = 1
+ij_kotlin_keep_blank_lines_before_right_brace = 0
+ij_kotlin_align_multiline_parameters = false
+ij_continuation_indent_size = 4
+ij_kotlin_code_style_defaults = KOTLIN_OFFICIAL
+ij_kotlin_name_count_to_use_star_import = 99
+ij_kotlin_name_count_to_use_star_import_for_members = 99
+
+# KTlint-specific rules https://spec.editorconfig.org/#supported-pairs
+# Read more at https://pinterest.github.io/ktlint/1.5.0/rules/standard/
+indent_size = 4
+indent_style = space
+ktlint_code_style = android_studio #ktlint_official
+max_line_length = 120
+ktlint_standard = disabled #disabled
+ktlint_experimental = enabled
+ktlint_function_naming_ignore_when_annotated_with = Composable, OtherAnnotation, Implementation
+ktlint_standard_final-newline = true
+# insert_final_newline = true
+
+
+

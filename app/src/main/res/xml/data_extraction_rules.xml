@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Alle SharedPreferences einschließen -->
+        <include domain="sharedpref" path="."/>
+        <!-- Alle Datenbanken einschließen -->
+        <include domain="database" path="."/>
+        <!-- Beispiel: Eine spezifische Datenbank ausschließen, falls sie zu groß oder temporär ist -->
+        <!-- <exclude domain="database" path="temporaere_cache_datenbank.db"/> -->
+        <!-- Alle Dateien im internen "files" Verzeichnis der App einschließen -->
+        <include domain="file" path="."/>
+        <!-- Beispiel: Ein spezifisches Unterverzeichnis im "files" Verzeichnis ausschließen -->
+        <!-- <exclude domain="file" path="temporaere_downloads/"/> -->
+
+        <!-- Standardmäßige Ausschlüsse für Verzeichnisse, die explizit nicht gesichert werden sollen -->
+        <!-- Wenn du Verzeichnisse namens "no_backup" in den jeweiligen Domains hast -->
+        <exclude domain="file" path="no_backup"/>
+        <exclude domain="database" path="no_backup"/>
+        <exclude domain="sharedpref" path="no_backup"/>
+        <!-- Hinweis: Cache-Verzeichnisse werden vom System standardmäßig oft schon ausgeschlossen. -->
+    </cloud-backup>
+    <device-transfer>
+        <!-- Für Geräte-zu-Gerät-Übertragungen nehmen wir meist die gleichen Regeln wie für Cloud-Backups. -->
+        <!-- Du könntest hier mehr einschließen, wenn bestimmte Dateien zu groß für die Cloud, -->
+        <!-- aber für eine direkte Übertragung in Ordnung sind. -->
+        <include domain="sharedpref" path="."/>
+        <include domain="database" path="."/>
+        <include domain="file" path="."/>
+        <!-- <exclude domain="database" path="temporaere_cache_datenbank.db"/> -->
+        <!-- <exclude domain="file" path="temporaere_downloads/"/> -->
+
+        <exclude domain="file" path="no_backup"/>
+        <exclude domain="database" path="no_backup"/>
+        <exclude domain="sharedpref" path="no_backup"/>
+    </device-transfer>
+</data-extraction-rules>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Alle SharedPreferences einschließen -->
+    <include domain="sharedpref" path="."/>
+    <!-- Beispiel: Eine spezifische SharedPreferences-Datei ausschließen -->
+    <!-- <exclude domain="sharedpref" path="geraetespezifische_einstellungen.xml"/> -->
+
+    <!-- Alle Datenbanken einschließen -->
+    <include domain="database" path="."/>
+    <!-- Beispiel: Eine spezifische Datenbank ausschließen -->
+    <!-- <exclude domain="database" path="temporaere_cache_datenbank.db"/> -->
+
+    <!-- Alle Dateien im internen "files" Verzeichnis der App einschließen -->
+    <include domain="file" path="."/>
+    <!-- Beispiel: Ein spezifisches Unterverzeichnis im "files" Verzeichnis ausschließen -->
+    <!-- <exclude domain="file" path="temporaere_downloads/"/> -->
+
+    <!--
+        Hinweis:
+        - Cache-Verzeichnisse werden vom System automatisch ausgeschlossen.
+        - Wenn du Dateien nicht sichern möchtest, lege sie idealerweise in Verzeichnisse,
+          die per `context.getNoBackupFilesDir()` (ab API 21) erstellt wurden.
+          Explizite <exclude>-Regeln sind eine zusätzliche Absicherung.
+    -->
+</full-backup-content>
