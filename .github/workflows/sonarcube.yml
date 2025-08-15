@@ -1,0 +1,78 @@
+name: SonarQube Analysis
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+    # Du möchtest SonarQube wahrscheinlich nicht bei jedem PR auf unkritische Branches laufen lassen,
+    # es sei denn, du nutzt die PR-Dekoration von SonarQube intensiv.
+  workflow_dispatch: # Ermöglicht manuelles Starten
+
+jobs:
+  sonarqube:
+    name: SonarQube Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          # SonarQube benötigt den vollständigen Git-Verlauf für eine genaue Analyse des neuen Codes,
+          # insbesondere für die Pull-Request-Dekoration.
+          fetch-depth: 0
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17' # Stelle sicher, dass dies die von deinem Projekt und SonarScanner benötigte Version ist
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4 # oder v3, falls v4 noch nicht stabil genug für dich ist
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Create google-services.json
+        run: echo '${{ secrets.GOOGLE_SERVICES_JSON_CONTENT }}' > app/google-services.json
+        # Wichtig: Stelle sicher, dass der Pfad 'app/google-services.json' korrekt ist.
+        # Wenn deine Datei direkt im Root des app-Moduls liegt, ist dies richtig.
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run SonarQube Scan
+        run: |
+          # Stelle sicher, dass das Projekt zuerst kompiliert wird
+          ./gradlew assemble # Oder spezifischer: ./gradlew assembleDebug
+          
+          # Führe dann die SonarQube-Analyse aus
+          ./gradlew sonarqube \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run SonarQube Scan
+        run: |
+          # Stelle sicher, dass das Projekt zuerst kompiliert wird
+          ./gradlew assemble # Oder spezifischer: ./gradlew assembleDebug
+          
+          # Führe dann die SonarQube-Analyse aus
+          ./gradlew sonarqube \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # SONAR_TOKEN und SONAR_HOST_URL werden direkt an den Gradle-Befehl übergeben.

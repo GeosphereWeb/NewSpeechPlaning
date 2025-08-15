@@ -1,0 +1,40 @@
+name: Detekt
+
+on:
+  workflow_call:
+
+  workflow_dispatch:
+
+  pull_request:
+    branches:
+      - main
+      - master
+    # Optional: Pfadfilter, um den Workflow nur bei Änderungen an Kotlin-Dateien auszuführen
+    # paths:
+    #   - '**.kt'
+    #   - '**.kts'
+
+jobs:
+  Detekt:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin" # Empfohlene Java-Distribution
+          java-version: "17"    # Übliche Java-Version für moderne Android-Projekte
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4 # Kümmert sich um Caching etc.
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run Detekt
+        # Führt die Detekt-Analyse über den Gradle-Wrapper aus
+        # Bei Fehlern (Code-Smells, die das Build fehlschlagen lassen) wird dieser Schritt fehlschlagen
+        run: ./gradlew detekt

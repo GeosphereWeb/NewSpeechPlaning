@@ -1,0 +1,48 @@
+name: Ktlint
+
+on:
+  workflow_call:
+
+  workflow_dispatch:
+
+  pull_request:
+    branches:
+      - main
+      - master
+    # Optional: Pfadfilter, um den Workflow nur bei Änderungen an Kotlin-Dateien auszuführen
+    # paths:
+    #   - '**.kt'
+    #   - '**.kts'
+
+jobs:
+  Ktlint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          # "temurin" ist der Nachfolger von "adopt" (AdoptOpenJDK) und wird empfohlen
+          distribution: "temurin"
+          # Stelle sicher, dass dies die Java-Version ist, die dein Projekt benötigt (z.B. 11, 17)
+          # Für neuere Android-Projekte ist oft Java 17 erforderlich oder empfohlen.
+          java-version: "17" # Oder "11", je nach Projektbedarf
+
+      - name: Setup Gradle
+        # Diese Action kümmert sich um das Caching von Gradle-Abhängigkeiten, was die Ausführung beschleunigt
+        uses: gradle/actions/setup-gradle@v4
+        # with: # Zusätzliche Optionen, falls benötigt
+        #   gradle-version: wrapper # Stellt sicher, dass die Wrapper-Version verwendet wird (Standard)
+        #   cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }} # Beispiel: Schreibzugriff auf Cache nur für main/master
+
+      # NEUER SCHRITT: Ausführungsberechtigungen für gradlew setzen
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run Ktlint
+        # Führt den Ktlint-Check über den Gradle-Wrapper aus
+        # Bei Fehlern wird dieser Schritt fehlschlagen und somit den Workflow-Lauf als fehlerhaft markieren
+        run: ./gradlew ktlintCheck
