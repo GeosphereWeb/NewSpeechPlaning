@@ -148,7 +148,6 @@ val dummyJsonContent = """
   ],
   "configuration_version": "1"
 }
-
 """.trimIndent()
 
 // Pfad zur ECHTEN, lokalen google-services.json im Projekt-Root (NICHT IN GIT)
@@ -158,6 +157,9 @@ val targetAppGoogleServices = project.file("google-services.json")
 
 // Task, um temporär die ECHTE google-services.json zu verwenden, falls lokal vorhanden
 val useRealGoogleServicesTask = tasks.register("useRealGoogleServicesForLocalBuild") {
+    description = "Task, um temporär die ECHTE google-services.json zu verwenden, falls lokal vorhanden"
+    group = "build"
+    outputs.upToDateWhen { false }
     onlyIf { realLocalGoogleServices.exists() } // Nur ausführen, wenn die ECHTE Datei im Projekt-Root existiert
     doLast {
         if (realLocalGoogleServices.exists()) {
@@ -175,12 +177,26 @@ val useRealGoogleServicesTask = tasks.register("useRealGoogleServicesForLocalBui
 }
 
 // Task, um die DUMMY google-services.json im app-Modul wiederherzustellen
-val restoreDummyGoogleServicesTask = tasks.register("restoreDummyGoogleServicesInAppModule")
-{
+val restoreDummyGoogleServicesTask = tasks.register("restoreDummyGoogleServicesInAppModule") {
+    description = "Task, um die DUMMY google-services.json im app-Modul wiederherzustellen"
+    group = "build"
+
+    // Diese Zeile sorgt dafür, dass der Task immer ausgeführt wird,
+    // indem seine Outputs als niemals aktuell deklariert werden.
+    outputs.upToDateWhen { false }
+
     doLast {
-        println("LOKALER BUILD: Stelle die DUMMY google-services.json im app-Modul wieder her.")
+        // Stelle sicher, dass dummyJsonContent nicht leer ist (einfache Überprüfung)
+        if (dummyJsonContent.isBlank()) {
+            throw GradleException("Dummy JSON content is blank. Check its definition.")
+        }
+
+        // Schreibe den dummyJsonContent in die targetAppGoogleServices Datei
         targetAppGoogleServices.writeText(dummyJsonContent)
+        println("INFO: Task '${name}' explicitly overwrote '${targetAppGoogleServices.absolutePath}'" +
+            " with predefined dummy content.")
     }
+
 }
 
 // Gradle-Konfiguration, um die Tasks korrekt einzubinden
