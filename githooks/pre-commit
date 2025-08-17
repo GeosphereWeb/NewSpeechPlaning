@@ -1,0 +1,53 @@
+#!/bin/sh
+
+	echo "---Zurücksetzung der ---" >&2
+	echo " ===== google-services.json ====== " >&2
+
+# Git pre-commit hook to replace google-services.json with a dummy version.
+# This script is executed from the root of the Git repository.
+
+# Path to the google-services.json file, relative to the repository root.
+# Make sure this path is correct for your project structure.
+TARGET_FILE_PATH="app/google-services.json"
+
+# Dummy content for google-services.json
+# Using a heredoc for multiline JSON content
+cat <<EOF > "$TARGET_FILE_PATH"
+{
+  "project_info": {
+    "project_number": "0",
+    "firebase_url": "https://dummy.firebaseio.com",
+    "project_id": "dummy-project",
+    "storage_bucket": "dummy-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:0:android:0",
+        "android_client_info": {
+          "package_name": "de.geosphere.speechplaning"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "dummy_api_key"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
+EOF
+
+# Stage the potentially modified google-services.json.
+# This ensures that the dummy version is included in the commit.
+git add "$TARGET_FILE_PATH"
+
+# Exit with 0 to indicate success and allow the commit.
+exit 0

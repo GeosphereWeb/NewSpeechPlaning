@@ -148,7 +148,6 @@ val dummyJsonContent = """
   ],
   "configuration_version": "1"
 }
-
 """.trimIndent()
 
 // Pfad zur ECHTEN, lokalen google-services.json im Projekt-Root (NICHT IN GIT)
