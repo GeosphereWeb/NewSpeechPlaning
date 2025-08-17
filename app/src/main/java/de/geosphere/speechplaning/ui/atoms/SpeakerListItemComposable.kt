@@ -46,7 +46,6 @@ fun SpeakerListItemComposable(
     moreIsRequested: (Speaker) -> Unit,
     expandCard: Boolean = false
 ) {
-//    val speeches by speakerViewModel.speeches.collectAsState()
     var showItem by remember { mutableStateOf(expandCard) }
     ListItem(
         modifier = Modifier

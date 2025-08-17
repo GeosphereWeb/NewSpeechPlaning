@@ -26,7 +26,9 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,8 +40,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -75,28 +79,7 @@ class MainActivity :
 
                 Scaffold(
                     topBar = {
-                        CenterAlignedTopAppBar(
-                            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                titleContentColor = MaterialTheme.colorScheme.primary,
-                            ),
-                            title = {
-                                Text(
-                                    "Centered Top App Bar",
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            },
-                            actions = {
-                                IconButton(onClick = { /* do something */ }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Menu,
-                                        contentDescription = "Localized description"
-                                    )
-                                }
-                            },
-                            scrollBehavior = scrollBehavior,
-                        )
+                        topBarComponents(scrollBehavior)
                     },
                     content = { innerPadding ->
                         NavHost(
@@ -119,50 +102,87 @@ class MainActivity :
                     },
 
                     bottomBar = {
-                        NavigationBar {
-                            BottomNavigationItem.tabs.forEachIndexed { index, navItems ->
-                                NavigationBarItem(
-                                    selected = currentDestination?.hierarchy?.any {
-                                        it.route == navItems.route::class.qualifiedName
-                                    } == true,
-                                    onClick = {
-                                        selectedItemIndex = index
-                                        navController.navigate(navItems.route) {
-                                            popUpTo(navController.graph.findStartDestination().id) {
-                                                saveState = true
-                                            }
-                                            launchSingleTop = true
-                                            restoreState = true
-                                        }
-                                        navController.navigate(navItems.route)
-                                    },
-                                    label = { Text(navItems.label) },
-                                    icon = {
-                                        BadgedBox(
-                                            badge = {
-                                                if (navItems.badgeCount != null) {
-                                                    Badge {
-                                                        Text(text = navItems.badgeCount.toString())
-                                                    }
-                                                } else if (navItems.hasNews) {
-                                                    Badge()
-                                                }
-                                            }
-                                        ) {
-                                            Icon(
-                                                imageVector = if (selectedItemIndex == index) {
-                                                    navItems.selectedIcon
-                                                } else {
-                                                    navItems.unselectedIcon
-                                                },
-                                                contentDescription = navItems.label
-                                            )
-                                        }
-                                    }
-                                )
-                            }
-                        }
+                        bottomBarComponents(currentDestination, selectedItemIndex, navController)
                     },
+                )
+            }
+        }
+    }
+
+    @Composable
+    @OptIn(ExperimentalMaterial3Api::class)
+    private fun topBarComponents(scrollBehavior: TopAppBarScrollBehavior) {
+        CenterAlignedTopAppBar(
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.primary,
+            ),
+            title = {
+                Text(
+                    "Centered Top App Bar",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            actions = {
+                IconButton(onClick = { /* do something */ }) {
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        contentDescription = "Localized description"
+                    )
+                }
+            },
+            scrollBehavior = scrollBehavior,
+        )
+    }
+
+    @Composable
+    private fun bottomBarComponents(
+        currentDestination: NavDestination?,
+        selectedItemIndex: Int,
+        navController: NavHostController
+    ) {
+        var selectedItemIndex1 = selectedItemIndex
+        NavigationBar {
+            BottomNavigationItem.tabs.forEachIndexed { index, navItems ->
+                NavigationBarItem(
+                    selected = currentDestination?.hierarchy?.any {
+                        it.route == navItems.route::class.qualifiedName
+                    } == true,
+                    onClick = {
+                        selectedItemIndex1 = index
+                        navController.navigate(navItems.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                        navController.navigate(navItems.route)
+                    },
+                    label = { Text(navItems.label) },
+                    icon = {
+                        BadgedBox(
+                            badge = {
+                                if (navItems.badgeCount != null) {
+                                    Badge {
+                                        Text(text = navItems.badgeCount.toString())
+                                    }
+                                } else if (navItems.hasNews) {
+                                    Badge()
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = if (selectedItemIndex1 == index) {
+                                    navItems.selectedIcon
+                                } else {
+                                    navItems.unselectedIcon
+                                },
+                                contentDescription = navItems.label
+                            )
+                        }
+                    }
                 )
             }
         }
