@@ -1,6 +1,7 @@
 package de.geosphere.speechplaning
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -48,9 +50,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import de.geosphere.speechplaning.data.repository.DistrictRepository
+import de.geosphere.speechplaning.mockup.MockedListOfDummyClasses
 import de.geosphere.speechplaning.ui.theme.SpeechPlaningTheme
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 @Suppress("UnusedPrivateProperty")
 class MainActivity :
@@ -68,8 +74,19 @@ class MainActivity :
             systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
+        val districtRepository: DistrictRepository by inject()
+        val test = MockedListOfDummyClasses.districtMockupList
+        test.forEach {
+            Log.i("Werner", "onCreate: $it")
+            lifecycleScope.launch {
+                districtRepository.saveDistrict(it)
+            }
+        }
+
         setContent {
             val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
+
 
             SpeechPlaningTheme {
                 val navController = rememberNavController()

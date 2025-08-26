@@ -209,7 +209,6 @@ val restoreDummyGoogleServicesTask = tasks.register("restoreDummyGoogleServicesI
         println("INFO: Task '${name}' explicitly overwrote '${targetAppGoogleServices.absolutePath}'" +
             " with predefined dummy content.")
     }
-
 }
 
 // NEUER, KORREKTER BLOCK mit der androidComponents API

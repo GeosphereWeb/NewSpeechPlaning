@@ -11,7 +11,8 @@ plugins {
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.ktlint)
     alias(libs.plugins.detekt) apply true
-    id("org.sonarqube") version "6.2.0.5505" // Überprüfe die neueste Version
+    id("org.sonarqube") version "6.2.0.5505"
+    alias(libs.plugins.android.library) apply false // Überprüfe die neueste Version
 }
 
 buildscript {
