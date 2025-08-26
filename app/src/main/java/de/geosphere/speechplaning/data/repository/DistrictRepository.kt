@@ -1,6 +1,8 @@
 package de.geosphere.speechplaning.data.repository
 
 import android.util.Log
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.toObject
 import de.geosphere.speechplaning.data.model.District
 import de.geosphere.speechplaning.data.services.FirestoreService
 import kotlinx.coroutines.CancellationException
@@ -12,7 +14,6 @@ import kotlinx.coroutines.tasks.await
 class DistrictRepository(firestoreService: FirestoreService) {
     val clazz = District::class.java
     private val collection = firestoreService.getCollection(clazz)
-
 
     /**
      * Retrieves all districts from Firestore and listens for real-time updates.
@@ -29,7 +30,7 @@ class DistrictRepository(firestoreService: FirestoreService) {
      *
      * @return A [Flow] of [List<District>] representing the districts in Firestore.
      */
-    fun getDistricts() : Flow<List<District>> = callbackFlow {
+    fun getDistricts(): Flow<List<District>> = callbackFlow {
         val listenerRegistration = collection
             .addSnapshotListener { querySnapshot, error ->
                 if (error != null) {
@@ -65,14 +66,39 @@ class DistrictRepository(firestoreService: FirestoreService) {
                 return@addSnapshotListener
             }
 
+
             if (documentSnapshot != null && documentSnapshot.exists()) {
                 try {
-                    val district = documentSnapshot.toObject(clazz)
-                    trySend(district) // Sende den gefundenen/aktualisierten Sprecher
-                } catch (e: Exception) {
-                    Log.e("DistrictRepository", "Error deserializing speaker document $districtId", e)
-                    // Optional: Flow mit Fehler schließen oder null senden, wenn Deserialisierung fehlschlägt
-                    trySend(null) // Oder close(e)
+                    // Versuche, das Dokument in ein District-Objekt umzuwandeln.
+                    // .toObject<District>() ist hier etwas typsicherer als .toObject(clazz)
+                    // und gibt bei Fehlschlag eher null zurück, kann aber auch Exceptions werfen.
+                    val district = documentSnapshot.toObject<District>() // Verwende die reified generic version
+                    if (district != null) {
+                        trySend(district)
+                    } else {
+                        // Der Fall, dass toObject() null zurückgibt, weil die Daten nicht passen,
+                        // aber keine Exception geworfen wurde.
+                        Log.w(
+                            "DistrictRepository",
+                            "District document $districtId could not be deserialized to District object (was null)."
+                        )
+                        // Oder du könntest hier einen spezifischen Fehler senden, wenn das ein kritischer Zustand ist
+                        trySend(null)
+                    }
+                } catch (e: FirebaseFirestoreException) {
+                    // Diese Exception sollte eigentlich schon im äußeren 'error'-Block gefangen werden,
+                    // aber zur Sicherheit und falls toObject() selbst eine spezifische Firestore-Exception wirft.
+                    Log.e("DistrictRepository", "Firestore error deserializing district document $districtId", e)
+                    close(e) // Den Flow mit dem Fehler schließen
+                } catch (e: RuntimeException) {
+                    // Fängt andere RuntimeExceptions, die während toObject() auftreten könnten (z.B.DatabaseException).
+                    // Dies ist immer noch etwas generisch, aber spezifischer als 'Exception'.
+                    // Oft ist es schwer vorherzusagen, welche genauen RuntimeExceptions hier auftreten können,
+                    // außer man kennt die Interna von Firestore sehr genau oder testet es ausgiebig.
+                    Log.e("DistrictRepository", "Runtime error deserializing district document $districtId", e)
+                    trySend(null) // Sende null, da die Deserialisierung fehlgeschlagen ist
+                    // Alternativ: close(DistrictDeserializationException("Failed to deserialize $districtId", e))
+                    // wenn du einen spezifischen Fehler propagieren möchtest.
                 }
             } else {
                 trySend(null) // Dokument nicht gefunden oder existiert nicht mehr
@@ -94,6 +120,7 @@ class DistrictRepository(firestoreService: FirestoreService) {
      * @throws RuntimeException wenn beim Löschen ein Fehler auftritt (außer bei Abbruch der Coroutine).
      * @throws CancellationException wenn die Coroutine während des Löschvorgangs abgebrochen wird.
      */
+    @Suppress("TooGenericExceptionCaught")
     suspend fun deleteDistrict(id: String): String {
         return try {
             collection.document(id).delete().await()
@@ -101,10 +128,13 @@ class DistrictRepository(firestoreService: FirestoreService) {
         } catch (e: CancellationException) {
             Log.e("DistrictRepository", "Delete District - Coroutine cancelled", e)
             throw e // Re-throw cancellation exceptions
-        } catch (e: Exception) {
-            // Logge den spezifischen Fehler und wirf ggf. eine spezifischere Exception
+        } catch (e: FirebaseFirestoreException) { // Spezifischere Exception für Firestore-Fehler
             Log.e("DistrictRepository", "Error deleting district $id", e)
-            throw RuntimeException("Failed to delete district $id", e)
+            // Du könntest hier eine eigene, spezifischere Exception werfen
+            throw DistrictRepositoryException("Failed to delete district $id", e)
+        } catch (e: Exception) { // Fallback für unerwartete Fehler
+            Log.e("DistrictRepository", "Unexpected error deleting district $id", e)
+            throw DistrictRepositoryException("An unexpected error occurred while deleting district $id", e)
         }
     }
 
@@ -123,6 +153,7 @@ class DistrictRepository(firestoreService: FirestoreService) {
      * @throws RuntimeException wenn beim Speichern ein Fehler auftritt (außer bei Abbruch der Coroutine).
      * @throws CancellationException wenn die Coroutine während des Speichervorgangs abgebrochen wird.
      */
+    @Suppress("TooGenericExceptionCaught")
     suspend fun saveDistrict(district: District): String {
         return try {
             if (district.id.isBlank()) {
@@ -136,10 +167,13 @@ class DistrictRepository(firestoreService: FirestoreService) {
             }
         } catch (e: CancellationException) {
             Log.e("DistrictRepository", "Save District - Coroutine cancelled", e)
-            throw e // Re-throw cancellation exceptions
-        } catch (e: Exception) {
+            throw e
+        } catch (e: FirebaseFirestoreException) { // Spezifischere Exception für Firestore-Fehler
             Log.e("DistrictRepository", "Error saving district ${district.id}", e)
-            throw RuntimeException("Failed to save district ${district.id}", e)
+            throw DistrictRepositoryException("Failed to save district ${district.id}", e)
+        } catch (e: Exception) { // Fallback für unerwartete Fehler
+            Log.e("DistrictRepository", "Unexpected error saving district ${district.id}", e)
+            throw DistrictRepositoryException("An unexpected error occurred while saving district ${district.id}", e)
         }
     }
 
