@@ -34,6 +34,13 @@ android {
 //            signingConfig = signingConfigs.getByName("debug")
         }
         debug {
+            // Replace testCoverageEnabled = true
+            // enableUnitTestCoverage = true // To enable coverage for unit tests
+            // enableAndroidTestCoverage = true // To enable coverage for instrumented tests
+            // Or enable both if needed:
+            isMinifyEnabled = false // Usually false for debug builds
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
         }
     }
     compileOptions {
