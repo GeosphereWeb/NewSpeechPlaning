@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
+@SuppressWarnings("kotlin:S3776")
 class DistrictRepository(firestoreService: FirestoreService) {
     val clazz = District::class.java
     private val collection = firestoreService.getCollection(clazz)
