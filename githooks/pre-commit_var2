@@ -1,0 +1,15 @@
+#!/bin/sh
+
+	echo "---Zurücksetzung der ---" >&2
+	echo " ===== google-services.json ====== " >&2
+
+# Der relative Pfad zur Datei, die ausgeschlossen werden soll
+FILE_TO_EXCLUDE="app/google-services.json"
+
+# Prüft, ob die Datei zum Commit hinzugefügt ("staged") wurde
+if git diff --cached --name-only | grep -q "$FILE_TO_EXCLUDE"; then
+  echo "Entferne $FILE_TO_EXCLUDE aus dem Commit."
+  git reset HEAD "$FILE_TO_EXCLUDE"
+fi
+
+exit 0
