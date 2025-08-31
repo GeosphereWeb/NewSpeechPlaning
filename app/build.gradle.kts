@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.detekt)
     alias(libs.plugins.kotlin.serialization)
+    id("jacoco")
 }
 
 android {
@@ -41,6 +42,7 @@ android {
             isMinifyEnabled = false // Usually false for debug builds
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
+            isTestCoverageEnabled = true
         }
     }
     compileOptions {
@@ -104,9 +106,14 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(libs.junit.jupiter.api)
 
-    testImplementation(libs.junit.jupiter.params)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+
+    testImplementation(libs.mockk)
     testImplementation(libs.mockk.android)
-    testImplementation(libs.mockk.agent)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.junit)
+    testImplementation(libs.junit.jupiter.params)
+    testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.kotlinx.coroutines.test)
 
     androidTestImplementation(libs.androidx.junit)

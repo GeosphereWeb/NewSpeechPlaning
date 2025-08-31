@@ -1,7 +1,7 @@
 [versions]
 agp = "8.12.1"
 detekt = "1.23.8"
-firebaseBom = "34.1.0"
+firebaseBom = "34.2.0"
 
 gson = "2.13.1"
 junitJupiter = "5.13.4"
@@ -14,9 +14,9 @@ espressoCore = "3.5.0"
 kotlinxCoroutinesTest = "1.10.2"
 kotlinxSerializationJson = "1.9.0"
 kotlinSerialization = "2.2.10"
-lifecycleRuntimeKtx = "2.9.2"
+lifecycleRuntimeKtx = "2.9.3"
 activityCompose = "1.10.1"
-composeBom = "2025.08.00"
+composeBom = "2025.08.01"
 firebaseFirestoreKtx = "25.1.4"
 ktlint = "13.1.0"
 
@@ -71,10 +71,11 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 ktlint-gradle = { module = "org.jlleitschuh.gradle:ktlint-gradle", version.ref = "ktlint" }
 
 androidx-ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "uiTestJunit4Android" }
-mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockk" }
-mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+# MockK für Unit- und Android-Tests
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
+mockk-agent-jvm = { group = "io.mockk", name = "mockk-agent-jvm", version.ref = "mockk" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
