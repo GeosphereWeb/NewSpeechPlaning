@@ -1,6 +1,7 @@
 package de.geosphere.speechplaning.data
 
 import android.content.Context
+import androidx.annotation.StringRes
 import de.geosphere.speechplaning.R
 
 /**
@@ -11,9 +12,7 @@ import de.geosphere.speechplaning.R
  *
  * @property resourceId The resource ID of the string representing the event's name.
  */
-enum class Event(
-    val resourceId: Int,
-) {
+enum class Event(@StringRes val resourceId: Int) {
     CIRCUIT_ASSEMBLY_WITH_CIRCUIT_OVERSEER(R.string.CIRCUIT_ASSEMBLY_WITH_CIRCUIT_OBSERVER),
     CIRCUIT_OVERSEER_CONGREGATION_VISIT(R.string.CIRCUIT_OVERSEER_CONGREGATION_VISIT),
     CONVENTION(R.string.CONVENTION),
