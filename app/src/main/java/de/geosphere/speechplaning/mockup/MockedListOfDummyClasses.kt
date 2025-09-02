@@ -2,6 +2,7 @@ package de.geosphere.speechplaning.mockup
 
 import de.geosphere.speechplaning.data.SpiritualStatus
 import de.geosphere.speechplaning.data.model.Congregation
+import de.geosphere.speechplaning.data.model.District
 import de.geosphere.speechplaning.data.model.Speaker
 import de.geosphere.speechplaning.data.model.Speech
 
@@ -996,6 +997,29 @@ class MockedListOfDummyClasses {
                     districtIds = "906",
                     active = true
                 ),
+            )
+
+        val districtMockupList =
+            mutableListOf<District>(
+                District(
+                    id = "100",
+                    circuitOverseerId = "",
+                    congregationIds = emptyList(),
+                    active = true
+                ),
+                District(
+                    id = "101",
+                    circuitOverseerId = "",
+                    congregationIds = emptyList(),
+                    active = true
+                ),
+                District(
+                    id = "102",
+                    circuitOverseerId = "",
+                    congregationIds = emptyList(),
+                    active = true
+                ),
+
             )
     }
 }

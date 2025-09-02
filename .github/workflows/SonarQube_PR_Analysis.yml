@@ -1,3 +1,4 @@
+
 name: SonarQube Pull Request Analysis
 
 on:
@@ -23,7 +24,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build and generate JaCoCo report
-        run: ./gradlew :app:build :app:testDebugUnitTestCoverage --stacktrace
+        run: ./gradlew jacocoTestReport --stacktrace
 
       - name: SonarQube Analysis
         uses: sonarsource/sonarqube-scan-action@master

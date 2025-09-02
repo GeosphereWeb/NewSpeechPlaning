@@ -19,8 +19,9 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class Congregation(
-    @DocumentId val congregationId: String = "",
-    val street: String = "",
-    val districtIds: String = "",
+    @DocumentId val id: String = "",
+    val name: String = "",
+    val address: String = "",
+    val meetingTime: String = "",
     val active: Boolean = true,
 ) : SavableDataClass()
