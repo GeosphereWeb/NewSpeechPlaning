@@ -42,7 +42,6 @@ android {
             isMinifyEnabled = false // Usually false for debug builds
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
-            isTestCoverageEnabled = true
         }
     }
     compileOptions {
