@@ -1,3 +1,4 @@
+
 import java.util.Locale
 
 plugins {
@@ -35,13 +36,7 @@ android {
 //            signingConfig = signingConfigs.getByName("debug")
         }
         debug {
-            // Replace testCoverageEnabled = true
-            // enableUnitTestCoverage = true // To enable coverage for unit tests
-            // enableAndroidTestCoverage = true // To enable coverage for instrumented tests
-            // Or enable both if needed:
             isMinifyEnabled = false // Usually false for debug builds
-            enableUnitTestCoverage = true
-            enableAndroidTestCoverage = true
         }
     }
     compileOptions {
@@ -92,13 +87,14 @@ dependencies {
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
     // Add the dependency for the Realtime Database library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
+    // When using the BoM, you don\'t specify versions in Firebase library dependencies
     implementation(libs.firebase.database)
 
     // // Koin
     // // dependencies with Koin
     implementation(libs.koin.android) // Oder die neueste Version
     implementation(libs.koin.androidx.compose)
+    implementation("org.jacoco:org.jacoco.core:0.8.11")
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.androidx.ui.test.junit4.android) // Für
 
@@ -256,3 +252,6 @@ androidComponents {
         }
     }
 }
+
+// Bindet das externe Kotlin-Skript für die JaCoCo-Konfiguration ein
+apply(from = "jacoco.gradle.kts")
