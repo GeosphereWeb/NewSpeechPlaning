@@ -23,7 +23,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build and generate JaCoCo report
-        run: ./gradlew build testDebugUnitTestCoverage --stacktrace
+        run: ./gradlew :app:build :app:testDebugUnitTestCoverage --stacktrace
 
       - name: SonarQube Analysis
         uses: sonarsource/sonarqube-scan-action@master
