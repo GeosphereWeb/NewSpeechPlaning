@@ -4,6 +4,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import de.geosphere.speechplaning.data.model.Speaker
 import kotlinx.coroutines.tasks.await
 
+@Suppress("TooGenericExceptionCaught", "TooGenericExceptionThrown" )
 class SpeakerRepository(private val firestore: FirebaseFirestore) {
 
     /**
