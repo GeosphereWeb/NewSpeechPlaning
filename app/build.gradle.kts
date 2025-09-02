@@ -212,42 +212,42 @@ val restoreDummyGoogleServicesTask = tasks.register("restoreDummyGoogleServicesI
 
 }
 
-// Gradle-Konfiguration, um die Tasks korrekt einzubinden
-afterEvaluate {
-    android.applicationVariants.forEach { variant ->
-        val capitalName = variant.name.replaceFirstChar { ch ->
-            if (ch.isLowerCase()) ch.titlecase(Locale.getDefault()).first() else ch
-        }
-        val processResourcesTaskName = "process${capitalName}GoogleServices"
-        val assembleTaskName = "assemble${capitalName}" // z.B. assembleDebug
+// NEUER, KORREKTER BLOCK mit der androidComponents API
+androidComponents {
+    onVariants { variant ->
+        // Macht aus "debug" -> "Debug", "release" -> "Release"
+        val capitalName = variant.name.replaceFirstChar { it.titlecase(Locale.getDefault()) }
 
-        // Stelle sicher, dass VOR der Verarbeitung der Google Services die ECHTE Datei kopiert wird (falls vorhanden)
-        tasks.findByName(processResourcesTaskName)?.let {
-            it.dependsOn(useRealGoogleServicesTask)
-            Unit
+        // --- Application Tasks ---
+        // z.B. processDebugGoogleServices
+        tasks.findByName("process${capitalName}GoogleServices")?.dependsOn(useRealGoogleServicesTask)
+
+        // z.B. assembleDebug
+        tasks.findByName("assemble${capitalName}")?.finalizedBy(restoreDummyGoogleServicesTask)
+
+
+        // --- Unit Test Tasks ---
+        variant.unitTest?.let { unitTest ->
+            // Macht aus "debugUnitTest" -> "DebugUnitTest"
+            val unitTestCapitalName = unitTest.name.replaceFirstChar { it.titlecase(Locale.getDefault()) }
+
+            // z.B. testDebugUnitTest
+            tasks.findByName("test${unitTestCapitalName}")?.let { testTask ->
+                testTask.finalizedBy(restoreDummyGoogleServicesTask)
+                testTask.dependsOn(useRealGoogleServicesTask)
+            }
         }
 
-        // Stelle sicher, dass NACH dem Assemble-Task die DUMMY-Datei wiederhergestellt wird
-        tasks.findByName(assembleTaskName)?.let {
-            it.finalizedBy(restoreDummyGoogleServicesTask)
-            Unit
-        }
-    }
-    // Für Unit-Tests ist dies normalerweise nicht relevant, da sie google-services.json selten direkt verarbeiten.
-    android.unitTestVariants.forEach { variant ->
-        val capitalName = variant.name.replaceFirstChar { ch ->
-            if (ch.isLowerCase()) ch.titlecase(Locale.getDefault()).first() else ch
-        }
-        val processResourcesTaskName = "process${capitalName}GoogleServices"
-        val assembleTaskName = "test${capitalName}UnitTest" // z.B. testDebugUnitTest
+        // --- Android Test Tasks ---
+        variant.androidTest?.let { androidTest ->
+            // Macht aus "debugAndroidTest" -> "DebugAndroidTest"
+            val androidTestCapitalName = androidTest.name.replaceFirstChar { it.titlecase(Locale.getDefault()) }
 
-        tasks.findByName(processResourcesTaskName)?.let {
-            it.dependsOn(useRealGoogleServicesTask)
-            Unit
-        }
-        tasks.findByName(assembleTaskName)?.let {
-            it.finalizedBy(restoreDummyGoogleServicesTask)
-            Unit
+            // z.B. processDebugAndroidTestGoogleServices
+            tasks.findByName("process${androidTestCapitalName}GoogleServices")?.dependsOn(useRealGoogleServicesTask)
+
+            // z.B. assembleDebugAndroidTest
+            tasks.findByName("assemble${androidTestCapitalName}")?.finalizedBy(restoreDummyGoogleServicesTask)
         }
     }
 }
