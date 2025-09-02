@@ -23,8 +23,6 @@ max_line_length = 120
 ktlint_standard = disabled #disabled
 ktlint_experimental = enabled
 ktlint_function_naming_ignore_when_annotated_with = Composable, OtherAnnotation, Implementation
-ktlint_standard_final-newline = true
-# insert_final_newline = true
-
-
-
+# ktlint_standard_final-newline = true
+end_of_line = lf
+insert_final_newline = true

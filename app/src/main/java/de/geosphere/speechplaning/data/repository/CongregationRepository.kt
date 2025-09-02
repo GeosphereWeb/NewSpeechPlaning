@@ -3,7 +3,7 @@ package de.geosphere.speechplaning.data.repository
 import com.google.firebase.firestore.FirebaseFirestore
 import de.geosphere.speechplaning.data.model.Congregation
 import kotlinx.coroutines.tasks.await
-
+@Suppress("TooGenericExceptionCaught", "TooGenericExceptionThrown")
 class CongregationRepository(private val firestore: FirebaseFirestore) {
 
     /**
