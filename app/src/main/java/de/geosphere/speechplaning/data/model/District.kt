@@ -8,6 +8,6 @@ import kotlinx.serialization.Serializable
 data class District(
     @DocumentId val id: String = "",
     val circuitOverseerId: String = "",
-    val congregationIds: List<String> = emptyList(),
+    val name: String = "",
     val active: Boolean = true,
 ) : SavableDataClass()
