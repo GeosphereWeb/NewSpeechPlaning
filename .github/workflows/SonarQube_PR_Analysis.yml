@@ -34,7 +34,7 @@ jobs:
         with:
           projectBaseDir: .
           args: >
-            -Dsonar.projectKey=new-speech-planing
+            -Dsonar.projectKey=GeosphereWeb_NewSpeechPlaning
             -Dsonar.projectName="NewSpeechPlaning"
             -Dsonar.organization=geosphereweb
             -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
