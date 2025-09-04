@@ -1,21 +1,12 @@
 package de.geosphere.speechplaning.data.repository
 
-import com.google.firebase.firestore.FirebaseFirestore
 import de.geosphere.speechplaning.data.model.Speaker
-import kotlinx.coroutines.tasks.await
+import de.geosphere.speechplaning.data.services.FirestoreService // Import geändert
 
-@Suppress("TooGenericExceptionCaught", "TooGenericExceptionThrown" )
-class SpeakerRepository(private val firestore: FirebaseFirestore) {
+@Suppress("TooGenericExceptionCaught", "TooGenericExceptionThrown")
+class SpeakerRepository(private val firestoreService: FirestoreService) { // Konstruktor geändert
 
-    /**
-     * Ruft die Referenz zur 'speakers'-Subcollection für eine bestimmte Versammlung ab.
-     * @param districtId Die ID des übergeordneten Districts.
-     * @param congregationId Die ID der übergeordneten Versammlung.
-     */
-    private fun getSpeakerCollection(districtId: String, congregationId: String) =
-        firestore.collection("districts").document(districtId)
-            .collection("congregations").document(congregationId)
-            .collection("speakers")
+    private fun parentCongregationsPath(districtId: String) = "districts/$districtId/congregations"
 
     /**
      * Speichert einen Redner in der Subcollection einer bestimmten Versammlung.
@@ -27,16 +18,28 @@ class SpeakerRepository(private val firestore: FirebaseFirestore) {
      */
     suspend fun saveSpeaker(districtId: String, congregationId: String, speaker: Speaker): String {
         return try {
-            val collection = getSpeakerCollection(districtId, congregationId)
+            val parentPath = parentCongregationsPath(districtId)
             if (speaker.id.isBlank()) {
-                val documentReference = collection.add(speaker).await()
-                documentReference.id
+                val newId = firestoreService.addDocumentToSubcollection(
+                    parentCollection = parentPath, // z.B. districts/districtXYZ
+                    parentId = congregationId,    // ID der Congregation
+                    subcollection = "speakers",
+                    data = speaker
+                )
+                speaker.copy(id = newId).id
             } else {
-                collection.document(speaker.id).set(speaker).await()
+                firestoreService.setDocumentInSubcollection(
+                    parentCollection = parentPath,
+                    parentId = congregationId,
+                    subcollection = "speakers",
+                    documentId = speaker.id,
+                    data = speaker
+                )
                 speaker.id
             }
         } catch (e: Exception) {
-            throw RuntimeException("Failed to save speaker", e)
+            // Es ist besser, spezifischere Fehler-Wrapper zu verwenden, wenn möglich
+            throw RuntimeException("Failed to save speaker for congregation $congregationId", e)
         }
     }
 
@@ -49,11 +52,37 @@ class SpeakerRepository(private val firestore: FirebaseFirestore) {
      */
     suspend fun getSpeakersForCongregation(districtId: String, congregationId: String): List<Speaker> {
         return try {
-            getSpeakerCollection(districtId, congregationId).get().await().toObjects(Speaker::class.java)
+            val parentPath = parentCongregationsPath(districtId)
+            firestoreService.getDocumentsFromSubcollection(
+                parentCollection = parentPath,
+                parentId = congregationId,
+                subcollection = "speakers",
+                objectClass = Speaker::class.java
+            )
         } catch (e: Exception) {
-            throw RuntimeException("Failed to get speakers", e)
+            throw RuntimeException("Failed to get speakers for congregation $congregationId", e)
         }
     }
 
-    // ... Ähnliche Methoden für deleteSpeaker etc.
+    /**
+     * Löscht einen bestimmten Redner.
+     *
+     *
+     * @param districtId Die ID des Districts.
+     * @param congregationId Die ID der Versammlung, zu der der Redner gehört.
+     * @param speakerId Die ID des zu löschenden Redners.
+     */
+    suspend fun deleteSpeaker(districtId: String, congregationId: String, speakerId: String) {
+        try {
+            val parentPath = parentCongregationsPath(districtId)
+            firestoreService.deleteDocumentFromSubcollection(
+                parentCollection = parentPath,
+                parentId = congregationId,
+                subcollection = "speakers",
+                documentId = speakerId
+            )
+        } catch (e: Exception) {
+            throw RuntimeException("Failed to delete speaker $speakerId", e)
+        }
+    }
 }
