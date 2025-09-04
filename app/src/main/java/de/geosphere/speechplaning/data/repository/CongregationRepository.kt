@@ -1,17 +1,15 @@
 package de.geosphere.speechplaning.data.repository
 
-import com.google.firebase.firestore.FirebaseFirestore
 import de.geosphere.speechplaning.data.model.Congregation
-import kotlinx.coroutines.tasks.await
-@Suppress("TooGenericExceptionCaught", "TooGenericExceptionThrown")
-class CongregationRepository(private val firestore: FirebaseFirestore) {
+import de.geosphere.speechplaning.data.services.FirestoreService // Import geändert
+import kotlinx.coroutines.tasks.await // Bleibt ggf. für spezifische Service-Implementierungen, wird hier aber nicht direkt verwendet
 
-    /**
-     * Ruft die Referenz zur 'congregations'-Subcollection für einen bestimmten District ab.
-     * @param districtId Die ID des übergeordneten Districts.
-     */
-    private fun getCongregationCollection(districtId: String) =
-        firestore.collection("districts").document(districtId).collection("congregations")
+@Suppress("TooGenericExceptionCaught", "TooGenericExceptionThrown")
+class CongregationRepository(private val firestoreService: FirestoreService) { // Konstruktor geändert
+
+    // Der Pfad zur Subcollection wird jetzt direkt hier oder im Service definiert
+    @Suppress("UnusedPrivateMember")
+    private fun congregationsPath(districtId: String) = "districts/$districtId/congregations"
 
     /**
      * Speichert eine Versammlung in der Subcollection eines bestimmten Districts.
@@ -24,16 +22,28 @@ class CongregationRepository(private val firestore: FirebaseFirestore) {
      */
     suspend fun saveCongregation(districtId: String, congregation: Congregation): String {
         return try {
-            val collection = getCongregationCollection(districtId)
+            // val path = congregationsPath(districtId) // Nicht mehr direkt verwendet, Logik im Service erwartet
             if (congregation.id.isBlank()) {
-                val documentReference = collection.add(congregation).await()
-                documentReference.id
+                // Annahme: FirestoreService hat eine Methode zum Hinzufügen von Dokumenten,
+                // die die neue ID zurückgibt oder die ID im Objekt setzt.
+                val newId = firestoreService.addDocumentToSubcollection(
+                    parentCollection = "districts",
+                    parentId = districtId,
+                    subcollection = "congregations",
+                    data = congregation
+                )
+                congregation.copy(id = newId).id // Sicherstellen, dass die ID zurückgegeben wird
             } else {
-                collection.document(congregation.id).set(congregation).await()
+                firestoreService.setDocumentInSubcollection(
+                    parentCollection = "districts",
+                    parentId = districtId,
+                    subcollection = "congregations",
+                    documentId = congregation.id,
+                    data = congregation
+                )
                 congregation.id
             }
         } catch (e: Exception) {
-            // Fange Fehler ab und logge sie oder wirf eine spezifische Exception
             throw RuntimeException("Failed to save congregation in district $districtId", e)
         }
     }
@@ -46,7 +56,13 @@ class CongregationRepository(private val firestore: FirebaseFirestore) {
      */
     suspend fun getCongregationsForDistrict(districtId: String): List<Congregation> {
         return try {
-            getCongregationCollection(districtId).get().await().toObjects(Congregation::class.java)
+            // Annahme: FirestoreService hat eine Methode zum Abrufen von Dokumenten aus einer Subcollection
+            firestoreService.getDocumentsFromSubcollection(
+                parentCollection = "districts",
+                parentId = districtId,
+                subcollection = "congregations",
+                objectClass = Congregation::class.java
+            )
         } catch (e: Exception) {
             throw RuntimeException("Failed to get congregations for district $districtId", e)
         }
@@ -60,7 +76,13 @@ class CongregationRepository(private val firestore: FirebaseFirestore) {
      */
     suspend fun deleteCongregation(districtId: String, congregationId: String) {
         try {
-            getCongregationCollection(districtId).document(congregationId).delete().await()
+            // Annahme: FirestoreService hat eine Methode zum Löschen eines Dokuments in einer Subcollection
+            firestoreService.deleteDocumentFromSubcollection(
+                parentCollection = "districts",
+                parentId = districtId,
+                subcollection = "congregations",
+                documentId = congregationId
+            )
         } catch (e: Exception) {
             throw RuntimeException("Failed to delete congregation $congregationId", e)
         }
