@@ -1,15 +1,10 @@
 package de.geosphere.speechplaning.data.repository
 
 import de.geosphere.speechplaning.data.model.Congregation
-import de.geosphere.speechplaning.data.services.FirestoreService // Import geändert
-import kotlinx.coroutines.tasks.await // Bleibt ggf. für spezifische Service-Implementierungen, wird hier aber nicht direkt verwendet
+import de.geosphere.speechplaning.data.services.FirestoreService
 
 @Suppress("TooGenericExceptionCaught", "TooGenericExceptionThrown")
-class CongregationRepository(private val firestoreService: FirestoreService) { // Konstruktor geändert
-
-    // Der Pfad zur Subcollection wird jetzt direkt hier oder im Service definiert
-    @Suppress("UnusedPrivateMember")
-    private fun congregationsPath(districtId: String) = "districts/$districtId/congregations"
+class CongregationRepository(private val firestoreService: FirestoreService) {
 
     /**
      * Speichert eine Versammlung in der Subcollection eines bestimmten Districts.
@@ -22,10 +17,7 @@ class CongregationRepository(private val firestoreService: FirestoreService) { /
      */
     suspend fun saveCongregation(districtId: String, congregation: Congregation): String {
         return try {
-            // val path = congregationsPath(districtId) // Nicht mehr direkt verwendet, Logik im Service erwartet
             if (congregation.id.isBlank()) {
-                // Annahme: FirestoreService hat eine Methode zum Hinzufügen von Dokumenten,
-                // die die neue ID zurückgibt oder die ID im Objekt setzt.
                 val newId = firestoreService.addDocumentToSubcollection(
                     parentCollection = "districts",
                     parentId = districtId,
@@ -56,7 +48,6 @@ class CongregationRepository(private val firestoreService: FirestoreService) { /
      */
     suspend fun getCongregationsForDistrict(districtId: String): List<Congregation> {
         return try {
-            // Annahme: FirestoreService hat eine Methode zum Abrufen von Dokumenten aus einer Subcollection
             firestoreService.getDocumentsFromSubcollection(
                 parentCollection = "districts",
                 parentId = districtId,
@@ -76,7 +67,6 @@ class CongregationRepository(private val firestoreService: FirestoreService) { /
      */
     suspend fun deleteCongregation(districtId: String, congregationId: String) {
         try {
-            // Annahme: FirestoreService hat eine Methode zum Löschen eines Dokuments in einer Subcollection
             firestoreService.deleteDocumentFromSubcollection(
                 parentCollection = "districts",
                 parentId = districtId,

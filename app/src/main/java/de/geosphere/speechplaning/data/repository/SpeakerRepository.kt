@@ -6,7 +6,6 @@ import de.geosphere.speechplaning.data.services.FirestoreService // Import geän
 @Suppress("TooGenericExceptionCaught", "TooGenericExceptionThrown")
 class SpeakerRepository(private val firestoreService: FirestoreService) { // Konstruktor geändert
 
-    // Hilfsfunktion, um den Pfad zur übergeordneten Collection (congregations) zu erstellen
     private fun parentCongregationsPath(districtId: String) = "districts/$districtId/congregations"
 
     /**
@@ -19,7 +18,7 @@ class SpeakerRepository(private val firestoreService: FirestoreService) { // Kon
      */
     suspend fun saveSpeaker(districtId: String, congregationId: String, speaker: Speaker): String {
         return try {
-            val parentPath = parentCongregationsPath(districtId) // Pfad zur congregations Collection
+            val parentPath = parentCongregationsPath(districtId)
             if (speaker.id.isBlank()) {
                 val newId = firestoreService.addDocumentToSubcollection(
                     parentCollection = parentPath, // z.B. districts/districtXYZ
