@@ -74,7 +74,10 @@ class CongregationRepository(private val firestoreService: FirestoreService) {
                 documentId = congregationId
             )
         } catch (e: Exception) {
-            throw RuntimeException("Failed to delete congregation $congregationId", e)
+            throw RuntimeException(
+                "Failed to delete congregation " +
+                    "$congregationId", e
+            )
         }
     }
 }
