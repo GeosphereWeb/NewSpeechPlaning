@@ -1,4 +1,3 @@
-
 // Kotlin-Version des JaCoCo-Build-Skripts.
 
 // Das jacoco-Plugin selbst und die Abhängigkeiten werden in app/build.gradle.kts verwaltet.
@@ -35,10 +34,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 
             // neue Ausschlüsse
             "**/*_Impl.class",
-            "**/*_ViewBinding.class",
-            "**/*_HiltModules*.*",
-            "**/*_HiltModules*.*",
-            "**/*_HiltModules*.*",
+            "**/*_HiltModules*.*", // Einmaliges Muster ist ausreichend
 
             "de/geosphere/speechplaning/data/model/**/*.class",
             "de/geosphere/speechplaning/data/repository/**/*.class",
@@ -47,12 +43,8 @@ tasks.register<JacocoReport>("jacocoTestReport") {
             "de/geosphere/speechplaning/data/network/**/*.class",
             "de/geosphere/speechplaning/di/**/*.class",
 
-            "app/src/main/java/de/geosphere/speechplaning/di/**/*.class",
-            "app/src/main/java/de/geosphere/speechplaning/data/repository/**/*.class",
-            "app/src/main/java/de/geosphere/speechplaning/data/services/**/*.class",
-
             "**/*Activity.class",
-            "**/*Fragment.class",
+            "**/*Fragment.class"
         )
     }
 
