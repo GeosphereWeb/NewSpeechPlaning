@@ -47,6 +47,10 @@ tasks.register<JacocoReport>("jacocoTestReport") {
             "de/geosphere/speechplaning/data/network/**/*.class",
             "de/geosphere/speechplaning/di/**/*.class",
 
+            "app/src/main/java/de/geosphere/speechplaning/di/**/*.class",
+            "app/src/main/java/de/geosphere/speechplaning/data/repository/**/*.class",
+            "app/src/main/java/de/geosphere/speechplaning/data/services/**/*.class",
+
             "**/*Activity.class",
             "**/*Fragment.class",
         )
