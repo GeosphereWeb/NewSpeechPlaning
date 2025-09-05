@@ -36,6 +36,9 @@ sonarqube {
         // HIER: Datei(en) von der SonarQube-Analyse ausschließen
         property("sonar.exclusions", "**/google-services.json,another/file/to/exclude.java")
 
+        // Pfad zum JaCoCo XML-Report
+        property("sonar.coverage.jacoco.xmlReportPaths", "${project(":app").buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+
         // Weitere Eigenschaften nach Bedarf (z.B. sonar.sources, sonar.java.binaries, etc.)
         // Diese werden oft automatisch durch das Gradle-Plugin und die Projektstruktur erkannt.
         property("sonar.gradle.skipCompile", "true")
