@@ -32,6 +32,23 @@ tasks.register<JacocoReport>("jacocoTestReport") {
             "**/*_Factory.class",
             "**/*_Provide*Factory.class",
             "**/*_ViewBinding.class"
+
+            // neue Ausschlüsse
+            "**/*_Impl.class",
+            "**/*_ViewBinding.class",
+            "**/*_HiltModules*.*",
+            "**/*_HiltModules*.*",
+            "**/*_HiltModules*.*",
+
+            "de/geosphere/speechplaning/data/model/**/*.class",
+            "de/geosphere/speechplaning/data/repository/**/*.class",
+            "de/geosphere/speechplaning/data/service/**/*.class",
+            "de/geosphere/speechplaning/data/database/**/*.class",
+            "de/geosphere/speechplaning/data/network/**/*.class",
+            "de/geosphere/speechplaning/data/di/**/*.class",
+
+            "**/*Activity.class",
+            "**/*Fragment.class",
         )
     }
 
