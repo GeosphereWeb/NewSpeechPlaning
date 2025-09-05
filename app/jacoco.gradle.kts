@@ -16,7 +16,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     // Pfad zu den kompilierten Klassendateien.
     // Wir schließen alles aus, was von Dagger, Hilt, DataBinding und bestimmten Android-Klassen generiert wird,
     // da wir diese nicht in unserer Code-Coverage sehen wollen.
-    val classDirs = fileTree("$buildDir/intermediates/classes/debug") {
+    val classDirs = fileTree("$buildDir/tmp/kotlin-classes/debug") { // <-- Pfad hier geändert
         exclude(
             "**/R.class",
             "**/R$*.class",
@@ -34,7 +34,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 
             // neue Ausschlüsse
             "**/*_Impl.class",
-            "**/*_HiltModules*.*", // Einmaliges Muster ist ausreichend
+            "**/*_HiltModules*.*", 
 
             "de/geosphere/speechplaning/data/model/**/*.class",
             "de/geosphere/speechplaning/data/repository/**/*.class",
