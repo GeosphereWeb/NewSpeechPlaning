@@ -2,6 +2,15 @@
 
 // Das jacoco-Plugin selbst und die Abhängigkeiten werden in app/build.gradle.kts verwaltet.
 
+// Lade JaCoCo-Klassenausschlüsse aus einer externen Datei
+val jacocoExclusionFile = rootProject.file("config/jacoco/jacoco_class_exclusions.txt")
+val jacocoExclusionPatterns = if (jacocoExclusionFile.exists()) {
+    jacocoExclusionFile.readLines().filter { it.isNotBlank() }
+} else {
+    println("Warning: JaCoCo class exclusion file not found at ${'$'}{jacocoExclusionFile.absolutePath}. No class exclusions will be applied.")
+    emptyList<String>() // Fallback, falls die Datei nicht existiert oder leer ist
+}
+
 // Erstellt den Task, den wir im Workflow aufrufen werden.
 tasks.register<JacocoReport>("jacocoTestReport") {
     // Dieser Task hängt von den normalen Unit-Tests ab.
@@ -16,36 +25,8 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     // Pfad zu den kompilierten Klassendateien.
     // Wir schließen alles aus, was von Dagger, Hilt, DataBinding und bestimmten Android-Klassen generiert wird,
     // da wir diese nicht in unserer Code-Coverage sehen wollen.
-    val classDirs = fileTree("$buildDir/tmp/kotlin-classes/debug") { // <-- Pfad hier geändert
-        exclude(
-            "**/R.class",
-            "**/R$*.class",
-            "**/BuildConfig.*",
-            "**/Manifest*.*",
-            "**/*Test*.*",
-            "android/**/*.*",
-            "**/*_MembersInjector.class",
-            "**/Dagger*Component.class",
-            "**/Dagger*Component\$Builder.class",
-            "**/Dagger*Module.class",
-            "**/*_Factory.class",
-            "**/*_Provide*Factory.class",
-            "**/*_ViewBinding.class",
-
-            // neue Ausschlüsse
-            "**/*_Impl.class",
-            "**/*_HiltModules*.*", 
-
-            "de/geosphere/speechplaning/data/model/**/*.class",
-            "de/geosphere/speechplaning/data/repository/**/*.class",
-            "de/geosphere/speechplaning/data/services/**/*.class",
-            "de/geosphere/speechplaning/data/database/**/*.class",
-            "de/geosphere/speechplaning/data/network/**/*.class",
-            "de/geosphere/speechplaning/di/**/*.class",
-
-            "**/*Activity.class",
-            "**/*Fragment.class"
-        )
+    val classDirs = fileTree("${'$'}buildDir/tmp/kotlin-classes/debug") { // <-- Pfad hier geändert
+        exclude(jacocoExclusionPatterns) // Lade Ausschlüsse aus der Liste
     }
 
     // Pfad zu den Quellcode-Dateien.

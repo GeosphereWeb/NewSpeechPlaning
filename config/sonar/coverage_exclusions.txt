@@ -1,0 +1,3 @@
+**/app/src/main/java/de/geosphere/speechplaning/di/**/*.kt
+**/app/src/main/java/de/geosphere/speechplaning/data/repository/**/*.kt
+**/app/src/main/java/de/geosphere/speechplaning/data/services/**/*.kt

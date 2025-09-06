@@ -2,8 +2,19 @@ import com.android.tools.r8.internal.md
 import io.gitlab.arturbosch.detekt.Detekt
 import org.gradle.kotlin.dsl.libs
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+import java.io.File
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+// Load coverage exclusion patterns from file
+val coverageExclusionFile = rootProject.file("config/sonar/coverage_exclusions.txt")
+val coverageExclusionPatterns = if (coverageExclusionFile.exists()) {
+    coverageExclusionFile.readLines().filter { it.isNotBlank() }.joinToString(",")
+} else {
+    println("Warning: SonarQube coverage exclusion file not found at ${coverageExclusionFile.absolutePath}. No exclusions will be applied.")
+    "" // Fallback, falls die Datei nicht existiert oder leer ist
+}
+
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
@@ -33,11 +44,19 @@ sonarqube {
         // sonar.host.url wird oft hier gesetzt, kann aber auch in der Action übergeben werden
         property("sonar.host.url", "https://sonarcloud.io")
 
-        // HIER: Datei(en) von der SonarQube-Analyse ausschließen
+        // HIER: Datei(en) von der SonarQube-Analyse ausschließen (allgemein)
         property("sonar.exclusions", "**/google-services.json,another/file/to/exclude.java")
 
+        // HIER: Quelldateien von der CODE COVERAGE ausschließen (aus Datei geladen)
+        if (coverageExclusionPatterns.isNotEmpty()) {
+            property("sonar.coverage.exclusions", coverageExclusionPatterns)
+        }
+
         // Pfad zum JaCoCo XML-Report
-        property("sonar.coverage.jacoco.xmlReportPaths", "${project(":app").buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            "${project(":app").buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+        )
 
         // Weitere Eigenschaften nach Bedarf (z.B. sonar.sources, sonar.java.binaries, etc.)
         // Diese werden oft automatisch durch das Gradle-Plugin und die Projektstruktur erkannt.
