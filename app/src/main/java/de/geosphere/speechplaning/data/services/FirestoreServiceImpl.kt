@@ -15,6 +15,7 @@ import de.geosphere.speechplaning.data.model.Speech
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.tasks.await
 
+@Suppress("TooManyFunctions", "TooGenericExceptionCaught", "TooGenericExceptionThrown")
 class FirestoreServiceImpl(private val firestore: FirebaseFirestore) : FirestoreService {
 
     override suspend fun <T> getDocument(collection: String, documentId: String, type: Class<T>): T? {
@@ -51,10 +52,6 @@ class FirestoreServiceImpl(private val firestore: FirebaseFirestore) : Firestore
         }
     }
 
-    // Wenn du Speaker und Congregation direkt mit IDs speicherst und nicht über 'add' neue generieren lässt,
-    // könntest du eine spezifischere save-Methode oder eine update-Methode benötigen,
-    // oder die saveDocument so anpassen, dass sie auch mit vorgegebener ID umgehen kann (set statt add).
-    // Für dieses Beispiel belassen wir sie erstmal so, da die Repositories die ID-Handhabung übernehmen.
     override suspend fun <T : SavableDataClass> saveDocument(collection: String, document: T): String {
         return try {
             val documentReference = firestore.collection(collection).add(document).await()
@@ -70,57 +67,35 @@ class FirestoreServiceImpl(private val firestore: FirebaseFirestore) : Firestore
         }
     }
 
-    // Diese Funktion ist gut für Top-Level-Collections.
-    // Für Subcollections brauchst du einen anderen Mechanismus oder musst den Pfad direkt übergeben.
     override fun <T> getCollection(clazz: Class<T>): CollectionReference {
         return when (clazz) {
             Chairman::class.java -> firestore.collection("chairmen")
-            Congregation::class.java -> firestore.collection("congregations") // Beibehaltung für Top-Level
+            Congregation::class.java -> firestore.collection("congregations")
             District::class.java -> firestore.collection("districts")
             LecturePlanning::class.java -> firestore.collection("lecturesPlanning")
             Speaker::class.java -> {
-                // Speaker ist jetzt eine Subcollection, daher ist ein direkter Aufruf hier nicht sinnvoll,
-                // es sei denn, du hättest auch eine Top-Level "allSpeakers" Collection (was hier nicht der Fall ist).
-                // Wir könnten hier eine Exception werfen oder eine leere Collection zurückgeben,
-                // da getSpeakersSubcollection der richtige Weg ist.
                 Log.w(
                     TAG, "Attempted to get Speaker collection as a top-level collection. " +
                         "Speakers are a subcollection of Congregations."
                 )
-                firestore.collection("speakers_dummy_do_not_use") // Oder Fehler werfen
+                firestore.collection("speakers_dummy_do_not_use")
             }
-
             Speech::class.java -> firestore.collection("speeches")
             else -> {
                 Log.e(TAG, "Unknown class type for collection: ${clazz.simpleName}")
-                // Zur Sicherheit, aber sollte nicht passieren
                 firestore.collection("unknown_collection_${clazz.simpleName}")
             }
         }
     }
 
-    // --- NEUE FUNKTION HINZUFÜGEN ---
-    /**
-     * Ruft die Referenz zur 'speakers'-Subcollection für eine gegebene Congregation-ID ab.
-     */
     override fun getSpeakersSubcollection(congregationId: String): CollectionReference {
         require(congregationId.isNotBlank()) {
             "Congregation ID cannot be blank to access speakers subcollection."
         }
-        // Wir verwenden die Konstante "congregations" hier direkt, da sie bekannt ist.
-        // Alternativ könntest du getCollection(Congregation::class.java).document(congregationId)... verwenden
         return firestore.collection("congregations").document(congregationId)
             .collection("speakers")
     }
 
-    // --- ERWEITERUNG FÜR SPEZIFISCHE DOKUMENTE/COLLECTIONS (optional, aber kann nützlich sein) ---
-    fun getCongregationsCollection(): CollectionReference {
-        return firestore.collection("congregations")
-    }
-
-    // Du könntest auch spezifische get/save Methoden für Speaker und Congregation hier anbieten,
-    // wenn du die Logik nicht komplett in den Repositories haben möchtest.
-    // Beispiel für ein spezifisches Speichern, das 'set' verwendet, um eine ID vorzugeben:
     override suspend fun <T : Any> saveDocumentWithId(
         collectionPath: String,
         documentId: String,
@@ -140,6 +115,91 @@ class FirestoreServiceImpl(private val firestore: FirebaseFirestore) : Firestore
         }
     }
 
+    // NEUE METHODEN FÜR SUBCOLLECTIONS
+    override suspend fun <T : Any> addDocumentToSubcollection(
+        parentCollection: String,
+        parentId: String,
+        subcollection: String,
+        data: T
+    ): String {
+        return try {
+            val documentReference = firestore.collection(parentCollection)
+                .document(parentId)
+                .collection(subcollection)
+                .add(data)
+                .await()
+            documentReference.id
+        } catch (e: Exception) {
+            Log.e(TAG, "Error adding document to subcollection $subcollection in $parentCollection/$parentId", e)
+            throw RuntimeException("Error adding document to subcollection $subcollection in " +
+                "$parentCollection/$parentId", e)
+        }
+    }
+
+    override suspend fun <T : Any> setDocumentInSubcollection(
+        parentCollection: String,
+        parentId: String,
+        subcollection: String,
+        documentId: String,
+        data: T
+    ) {
+        try {
+            firestore.collection(parentCollection)
+                .document(parentId)
+                .collection(subcollection)
+                .document(documentId)
+                .set(data)
+                .await()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error setting document $documentId in subcollection $subcollection in " +
+                "$parentCollection/$parentId", e)
+            throw RuntimeException("Error setting document $documentId in subcollection $subcollection in " +
+                "$parentCollection/$parentId", e)
+        }
+    }
+
+    override suspend fun <T : Any> getDocumentsFromSubcollection(
+        parentCollection: String,
+        parentId: String,
+        subcollection: String,
+        objectClass: Class<T>
+    ): List<T> {
+        return try {
+            val querySnapshot = firestore.collection(parentCollection)
+                .document(parentId)
+                .collection(subcollection)
+                .get()
+                .await()
+            querySnapshot.toObjects(objectClass)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting documents from subcollection $subcollection in $parentCollection/$parentId", e)
+            throw RuntimeException("Error getting documents from subcollection $subcollection in " +
+                "$parentCollection/$parentId", e)
+        }
+    }
+
+    override suspend fun deleteDocumentFromSubcollection(
+        parentCollection: String,
+        parentId: String,
+        subcollection: String,
+        documentId: String
+    ) {
+        try {
+            firestore.collection(parentCollection)
+                .document(parentId)
+                .collection(subcollection)
+                .document(documentId)
+                .delete()
+                .await()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error deleting document $documentId from subcollection $subcollection in " +
+                "$parentCollection/$parentId", e)
+            throw RuntimeException("Error deleting document $documentId from subcollection $subcollection in " +
+                "$parentCollection/$parentId", e)
+        }
+    }
+
+    // Bestehende spezifische Methoden für Subcollections (falls vorhanden und noch genutzt)
     suspend fun <T : Any> saveSubCollectionDocumentWithId(
         parentCollectionPath: String,
         parentId: String,

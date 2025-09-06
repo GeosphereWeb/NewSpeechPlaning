@@ -1,17 +1,10 @@
 package de.geosphere.speechplaning.data.repository
 
-import com.google.firebase.firestore.FirebaseFirestore
 import de.geosphere.speechplaning.data.model.Congregation
-import kotlinx.coroutines.tasks.await
-@Suppress("TooGenericExceptionCaught", "TooGenericExceptionThrown")
-class CongregationRepository(private val firestore: FirebaseFirestore) {
+import de.geosphere.speechplaning.data.services.FirestoreService
 
-    /**
-     * Ruft die Referenz zur 'congregations'-Subcollection für einen bestimmten District ab.
-     * @param districtId Die ID des übergeordneten Districts.
-     */
-    private fun getCongregationCollection(districtId: String) =
-        firestore.collection("districts").document(districtId).collection("congregations")
+@Suppress("TooGenericExceptionCaught", "TooGenericExceptionThrown")
+class CongregationRepository(private val firestoreService: FirestoreService) {
 
     /**
      * Speichert eine Versammlung in der Subcollection eines bestimmten Districts.
@@ -24,16 +17,25 @@ class CongregationRepository(private val firestore: FirebaseFirestore) {
      */
     suspend fun saveCongregation(districtId: String, congregation: Congregation): String {
         return try {
-            val collection = getCongregationCollection(districtId)
             if (congregation.id.isBlank()) {
-                val documentReference = collection.add(congregation).await()
-                documentReference.id
+                val newId = firestoreService.addDocumentToSubcollection(
+                    parentCollection = "districts",
+                    parentId = districtId,
+                    subcollection = "congregations",
+                    data = congregation
+                )
+                congregation.copy(id = newId).id // Sicherstellen, dass die ID zurückgegeben wird
             } else {
-                collection.document(congregation.id).set(congregation).await()
+                firestoreService.setDocumentInSubcollection(
+                    parentCollection = "districts",
+                    parentId = districtId,
+                    subcollection = "congregations",
+                    documentId = congregation.id,
+                    data = congregation
+                )
                 congregation.id
             }
         } catch (e: Exception) {
-            // Fange Fehler ab und logge sie oder wirf eine spezifische Exception
             throw RuntimeException("Failed to save congregation in district $districtId", e)
         }
     }
@@ -46,7 +48,12 @@ class CongregationRepository(private val firestore: FirebaseFirestore) {
      */
     suspend fun getCongregationsForDistrict(districtId: String): List<Congregation> {
         return try {
-            getCongregationCollection(districtId).get().await().toObjects(Congregation::class.java)
+            firestoreService.getDocumentsFromSubcollection(
+                parentCollection = "districts",
+                parentId = districtId,
+                subcollection = "congregations",
+                objectClass = Congregation::class.java
+            )
         } catch (e: Exception) {
             throw RuntimeException("Failed to get congregations for district $districtId", e)
         }
@@ -60,9 +67,17 @@ class CongregationRepository(private val firestore: FirebaseFirestore) {
      */
     suspend fun deleteCongregation(districtId: String, congregationId: String) {
         try {
-            getCongregationCollection(districtId).document(congregationId).delete().await()
+            firestoreService.deleteDocumentFromSubcollection(
+                parentCollection = "districts",
+                parentId = districtId,
+                subcollection = "congregations",
+                documentId = congregationId
+            )
         } catch (e: Exception) {
-            throw RuntimeException("Failed to delete congregation $congregationId", e)
+            throw RuntimeException(
+                "Failed to delete congregation " +
+                    "$congregationId", e
+            )
         }
     }
 }
