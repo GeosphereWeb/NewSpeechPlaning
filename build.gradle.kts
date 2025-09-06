@@ -47,10 +47,14 @@ sonarqube {
         // HIER: Datei(en) von der SonarQube-Analyse ausschließen (allgemein)
         property("sonar.exclusions", "**/google-services.json,another/file/to/exclude.java")
 
-        // HIER: Quelldateien von der CODE COVERAGE ausschließen (aus Datei geladen)
+        // HIER: Quelldateien von der CODE COVERAGE ausschließen (aus Datei geladen) - TESTWEISE AUSKOMMENTIERT
+        /*
         if (coverageExclusionPatterns.isNotEmpty()) {
             property("sonar.coverage.exclusions", coverageExclusionPatterns)
         }
+        */
+        // TEST: Harter Ausschluss für eine einzelne Datei
+        property("sonar.coverage.exclusions", "**/app/src/main/java/de/geosphere/speechplaning/di/ApplicationModule.kt")
 
         // Pfad zum JaCoCo XML-Report
         property(
