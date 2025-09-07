@@ -40,7 +40,7 @@ buildscript {
 sonarqube {
     properties {
         property("sonar.projectKey", "GeosphereWeb_NewSpeechPlaning") // Ersetze dies mit deinem Projekt-Key
-        property("sonar.organization", "gesosphereweb") // Nur für SonarCloud, ansonsten entfernen oder anpassen
+        property("sonar.organization", "geosphereweb") // Nur für SonarCloud, ansonsten entfernen oder anpassen
         // sonar.host.url wird oft hier gesetzt, kann aber auch in der Action übergeben werden
         property("sonar.host.url", "https://sonarcloud.io")
 
