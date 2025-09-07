@@ -101,8 +101,6 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(libs.junit.jupiter.api)
 
-    testRuntimeOnly(libs.junit.jupiter.engine)
-
     testImplementation(libs.mockk)
     testImplementation(libs.mockk.android)
     testImplementation(libs.kotlinx.coroutines.test)
@@ -110,6 +108,8 @@ dependencies {
     testImplementation(libs.junit.jupiter.params)
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.kotlinx.coroutines.test)
+
+    testRuntimeOnly(libs.junit.jupiter.engine)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
