@@ -1,4 +1,3 @@
-
 name: SonarQube Pull Request Analysis
 
 on:
@@ -26,19 +25,17 @@ jobs:
       - name: Build and generate JaCoCo report
         run: ./gradlew jacocoTestReport --stacktrace
 
-      - name: SonarQube Analysis
-        uses: sonarsource/sonarqube-scan-action@master
+      - name: SonarQube Analysis # DIESER SCHRITT WIRD ERSETZT
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        with:
-          projectBaseDir: .
-          args: >
-            -Dsonar.projectKey=GeosphereWeb_NewSpeechPlaning
-            -Dsonar.projectName=NewSpeechPlaning
-            -Dsonar.organization=geosphereweb
-            -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
-            -Dsonar.pullrequest.branch=${{ github.event.pull_request.head.ref }}
-            -Dsonar.pullrequest.base=${{ github.event.pull_request.base.ref }}
-            -Dsonar.java.binaries=**/build/intermediates/javac/**
-            -Dsonar.coverage.jacoco.xmlReportPaths=**/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+          # SONAR_HOST_URL wird aus build.gradle.kts verwendet, falls dort konfiguriert,
+          # oder Sie können es hier explizit setzen, wenn nötig:
+          # SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          ./gradlew sonarqube --stacktrace \
+            -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
+            -Dsonar.pullrequest.branch=${{ github.event.pull_request.head.ref }} \
+            -Dsonar.pullrequest.base=${{ github.event.pull_request.base.ref }} \
+            -Dsonar.pullrequest.github.repository=${{ github.repository }} \
+            -Dsonar.pullrequest.provider=github
