@@ -94,14 +94,12 @@ dependencies {
     // // dependencies with Koin
     implementation(libs.koin.android) // Oder die neueste Version
     implementation(libs.koin.androidx.compose)
-    implementation("org.jacoco:org.jacoco.core:0.8.11")
+    implementation(libs.org.jacoco.core)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.androidx.ui.test.junit4.android) // Für
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit.jupiter.api)
-
-    testRuntimeOnly(libs.junit.jupiter.engine)
 
     testImplementation(libs.mockk)
     testImplementation(libs.mockk.android)
@@ -110,6 +108,8 @@ dependencies {
     testImplementation(libs.junit.jupiter.params)
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.kotlinx.coroutines.test)
+
+    testRuntimeOnly(libs.junit.jupiter.engine)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
