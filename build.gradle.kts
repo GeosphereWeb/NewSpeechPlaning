@@ -39,13 +39,14 @@ buildscript {
 
 sonarqube {
     properties {
-        property("sonar.projectKey", "GeosphereWeb_NewSpeechPlaning") // Ersetze dies mit deinem Projekt-Key
-        property("sonar.organization", "geosphereweb") // Nur für SonarCloud, ansonsten entfernen oder anpassen
+        property("sonar.projectKey", "GeosphereWeb_NewSpeechPlan")
+        property("sonar.organization", "geosphereweb")
         // sonar.host.url wird oft hier gesetzt, kann aber auch in der Action übergeben werden
         property("sonar.host.url", "https://sonarcloud.io")
 
         // HIER: Datei(en) von der SonarQube-Analyse ausschließen (allgemein)
         property("sonar.exclusions", "**/google-services.json,another/file/to/exclude.java")
+        property("sonar.sourceEncoding", "UTF-8") // Explizit setzen
 
         // HIER: Quelldateien von der CODE COVERAGE ausschließen (aus Datei geladen)
         if (coverageExclusionPatterns.isNotEmpty()) {
@@ -57,10 +58,11 @@ sonarqube {
             "sonar.coverage.jacoco.xmlReportPaths",
             "${project(":app").buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
         )
+        property("sonar.androidLint.reportPaths", "${project(":app").buildDir}/reports/lint-results.xml")
+        property("sonar.gradle.skipCompile", "true")
 
         // Weitere Eigenschaften nach Bedarf (z.B. sonar.sources, sonar.java.binaries, etc.)
         // Diese werden oft automatisch durch das Gradle-Plugin und die Projektstruktur erkannt.
-        property("sonar.gradle.skipCompile", "true")
     }
 }
 

@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "New Speech Planing"
+rootProject.name = "New Speech Plan"
 include(":app")
