@@ -10,7 +10,6 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.kotlin.serialization)
     id("jacoco")
-
 }
 
 android {

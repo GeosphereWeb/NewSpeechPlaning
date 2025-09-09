@@ -1,8 +1,6 @@
-import com.android.tools.r8.internal.md
 import io.gitlab.arturbosch.detekt.Detekt
 import org.gradle.kotlin.dsl.libs
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
-import java.io.File
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
