@@ -1,5 +1,5 @@
 # Der Name des Workflows, den du in GitHub Actions siehst
-name: Scan for TODOs and create Jira tickets
+name: "Scan for TODOs and create Jira tickets"
 
 # Der Workflow wird bei jedem Push in den 'main'-Branch ausgelöst
 on:
@@ -22,7 +22,7 @@ jobs:
         run: |
           # Findet alle TODO-Kommentare in .js- und .ts-Dateien
           # und formatiert sie. Du kannst die Dateitypen anpassen.
-          TODOS=$(grep -r -E 'TODO:' --include=\*.{js,ts} . | sed 's/ /%20/g')
+          TODOS=$(grep -r -E 'TODO:' --include=\*.{kt,kts} . | sed 's/ /%20/g')
           # Entfernt die Pfade, sodass nur der TODO-Text übrig bleibt
           TODOS=$(echo "$TODOS" | sed -E 's/^\.\/[^:]*://')
           echo "Todos found: $TODOS"
