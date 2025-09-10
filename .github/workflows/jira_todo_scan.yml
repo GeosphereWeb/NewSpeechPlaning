@@ -6,6 +6,8 @@ on:
   push:
     branches:
       - main
+      - master
+    workflow_dispatch:
 
 # Die Jobs, die ausgeführt werden sollen
 jobs:
