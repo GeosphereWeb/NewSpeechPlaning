@@ -8,6 +8,7 @@ import de.geosphere.speechplaning.data.services.FirestoreService
 import de.geosphere.speechplaning.data.services.FirestoreServiceImpl
 import org.koin.dsl.module
 
+@Suppress("ForbiddenComment")
 val appModule =
     module {
         // Database
@@ -20,7 +21,7 @@ val appModule =
         single { SpeakerRepository(get()) }
 
         // Use Cases Speech
-        // ToDo: Dies ist ein Test für JIRA mit automatische Erstellung von tickets
+        // TODO: Dies ist ein Test für JIRA mit automatische Erstellung von tickets
 
 
         // viewModels
