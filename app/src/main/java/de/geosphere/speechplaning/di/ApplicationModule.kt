@@ -20,7 +20,7 @@ val appModule =
         single { SpeakerRepository(get()) }
 
         // Use Cases Speech
-        // ToDo: Dies ist ein Test für JIRA mit automatische Erstellung von tickets
+        // TODO: Dies ist ein Test für JIRA mit automatische Erstellung von tickets
 
 
         // viewModels
