@@ -20,7 +20,7 @@ jobs:
       - name: Scan for TODO comments
         id: find_todos
         run: |
-          # Findet alle TODO-Kommentare in .js- und .ts-Dateien
+          # Findet alle TODO-Kommentare in .kt- und .kts-Dateien
           # und formatiert sie. Du kannst die Dateitypen anpassen.
           TODOS=$(grep -r -E 'TODO:' --include=\*.{kt,kts} . | sed 's/ /%20/g')
           # Entfernt die Pfade, sodass nur der TODO-Text übrig bleibt
