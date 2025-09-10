@@ -8,6 +8,7 @@ import de.geosphere.speechplaning.data.services.FirestoreService
 import de.geosphere.speechplaning.data.services.FirestoreServiceImpl
 import org.koin.dsl.module
 
+@Suppress("ForbiddenComment")
 val appModule =
     module {
         // Database
