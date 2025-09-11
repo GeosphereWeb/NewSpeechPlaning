@@ -9,7 +9,10 @@ val coverageExclusionFile = rootProject.file("config/sonar/coverage_exclusions.t
 val coverageExclusionPatterns = if (coverageExclusionFile.exists()) {
     coverageExclusionFile.readLines().filter { it.isNotBlank() }.joinToString(",")
 } else {
-    println("Warning: SonarQube coverage exclusion file not found at ${coverageExclusionFile.absolutePath}. No exclusions will be applied.")
+    println(
+        "Warning: SonarQube coverage exclusion file not found at ${coverageExclusionFile.absolutePath}. " +
+            "No exclusions will be applied."
+    )
     "" // Fallback, falls die Datei nicht existiert oder leer ist
 }
 
