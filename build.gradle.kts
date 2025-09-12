@@ -68,9 +68,9 @@ sonarqube {
 
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
-            "${project(":app").buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+            "${project(":app").layout.buildDirectory}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
         )
-        property("sonar.androidLint.reportPaths", "${project(":app").buildDir}/reports/lint-results.xml")
+        property("sonar.androidLint.reportPaths", "${project(":app").layout.buildDirectory}/reports/lint-results.xml")
         property("sonar.gradle.skipCompile", "true")
 
         // Weitere Eigenschaften nach Bedarf (z.B. sonar.sources, sonar.java.binaries, etc.)

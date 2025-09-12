@@ -1,5 +1,5 @@
-import java.util.Locale
 import org.gradle.testing.jacoco.tasks.JacocoReport
+import java.util.Locale
 
 plugins {
     alias(libs.plugins.android.application)
@@ -115,8 +115,8 @@ dependencies {
     testImplementation(libs.junit.jupiter.params)
     testImplementation(libs.mockk) {
         exclude(group = "io.mockk", module = "mockk-android")
-}
-    //testImplementation(libs.mockk.android) // Remove, not needed for pure unit tests
+    }
+    // testImplementation(libs.mockk.android) // Remove, not needed for pure unit tests
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit) // JUnit 4 für backwards compatibility
 
@@ -215,8 +215,10 @@ val restoreDummyGoogleServicesTask = tasks.register("restoreDummyGoogleServicesI
 
         // Schreibe den dummyJsonContent in die targetAppGoogleServices Datei
         targetAppGoogleServices.writeText(dummyJsonContent)
-        println("INFO: Task '${name}' explicitly overwrote '${targetAppGoogleServices.absolutePath}'" +
-            " with predefined dummy content.")
+        println(
+            "INFO: Task '$name' explicitly overwrote '${targetAppGoogleServices.absolutePath}'" +
+                " with predefined dummy content."
+        )
     }
 }
 
@@ -231,8 +233,7 @@ androidComponents {
         tasks.findByName("process${capitalName}GoogleServices")?.dependsOn(useRealGoogleServicesTask)
 
         // z.B. assembleDebug
-        tasks.findByName("assemble${capitalName}")?.finalizedBy(restoreDummyGoogleServicesTask)
-
+        tasks.findByName("assemble$capitalName")?.finalizedBy(restoreDummyGoogleServicesTask)
 
         // --- Unit Test Tasks ---
         variant.unitTest?.let { unitTest ->
@@ -240,7 +241,7 @@ androidComponents {
             val unitTestCapitalName = unitTest.name.replaceFirstChar { it.titlecase(Locale.getDefault()) }
 
             // z.B. testDebugUnitTest
-            tasks.findByName("test${unitTestCapitalName}")?.let { testTask ->
+            tasks.findByName("test$unitTestCapitalName")?.let { testTask ->
                 testTask.finalizedBy(restoreDummyGoogleServicesTask)
                 testTask.dependsOn(useRealGoogleServicesTask)
             }
@@ -255,7 +256,7 @@ androidComponents {
             tasks.findByName("process${androidTestCapitalName}GoogleServices")?.dependsOn(useRealGoogleServicesTask)
 
             // z.B. assembleDebugAndroidTest
-            tasks.findByName("assemble${androidTestCapitalName}")?.finalizedBy(restoreDummyGoogleServicesTask)
+            tasks.findByName("assemble$androidTestCapitalName")?.finalizedBy(restoreDummyGoogleServicesTask)
         }
     }
 }
@@ -270,7 +271,10 @@ val jacocoExclusionFile = rootProject.file("config/jacoco/jacoco_class_exclusion
 val jacocoExclusionPatterns = if (jacocoExclusionFile.exists()) {
     jacocoExclusionFile.readLines().filter { it.isNotBlank() }
 } else {
-    println("Warning: JaCoCo class exclusion file not found at ${jacocoExclusionFile.absolutePath}. No class exclusions will be applied.")
+    println(
+        "Warning: JaCoCo class exclusion file not found at ${jacocoExclusionFile.absolutePath}. " +
+            "No class exclusions will be applied."
+    )
     emptyList<String>() // Fallback, falls die Datei nicht existiert oder leer ist
 }
 
@@ -290,7 +294,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     // Pfad zu den kompilierten Klassendateien.
     // Wir schließen alles aus, was von Dagger, Hilt, DataBinding und bestimmten Android-Klassen generiert wird,
     // da wir diese nicht in unserer Code-Coverage sehen wollen.
-    val classDirs = fileTree("$buildDir/tmp/kotlin-classes/debug") { // <-- Korrigiert
+    val classDirs = fileTree("${layout.buildDirectory}/tmp/kotlin-classes/debug") { // <-- Korrigiert
         exclude(jacocoExclusionPatterns) // Lade Ausschlüsse aus der Liste
     }
 
@@ -303,7 +307,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 
     // Wo die .exec-Dateien mit den Coverage-Daten liegen.
     executionData.setFrom(
-        fileTree(buildDir) {
+        fileTree(layout.buildDirectory) {
             include(
                 "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
                 "jacoco/testDebugUnitTest.exec" // Fallback-Pfad
