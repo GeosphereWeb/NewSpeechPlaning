@@ -3,3 +3,4 @@
 **/app/src/main/java/de/geosphere/speechplaning/data/services/**/*.kt
 **/app/src/main/java/de/geosphere/speechplaning/mockup/**/*.kt
 **/app/**/build.gradle.kts
+**/app/**/MainActivity.kt
