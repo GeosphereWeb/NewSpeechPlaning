@@ -23,7 +23,7 @@ abstract class BaseFirestoreRepository<T : Any>(
      * um das korrekte ID-Feld der Entität zurückzugeben.
      * Z.B.: return entity.id
      */
-    protected abstract fun extractIdFromEntity(entity: T): String
+    internal abstract fun extractIdFromEntity(entity: T): String
 
     /**
      * Prüft, ob die ID der Entität als "leer" oder "neu" betrachtet werden soll.

@@ -51,6 +51,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import de.geosphere.speechplaning.data.repository.DistrictRepository
+import de.geosphere.speechplaning.data.repository.SpeechRepository
 import de.geosphere.speechplaning.mockup.MockedListOfDummyClasses
 import de.geosphere.speechplaning.ui.theme.SpeechPlaningTheme
 import kotlinx.coroutines.launch
@@ -79,7 +80,15 @@ class MainActivity :
         test.forEach {
             Log.i("Werner", "onCreate: $it")
             lifecycleScope.launch {
-                districtRepository.saveDistrict(it)
+                districtRepository.save(it)
+            }
+        }
+        val speechRepository: SpeechRepository by inject()
+        val test2 = MockedListOfDummyClasses.speechesMockupList
+        test2.forEach {
+            Log.i("Werner", "onCreate: $it")
+            lifecycleScope.launch {
+                speechRepository.save(it)
             }
         }
 
@@ -96,7 +105,7 @@ class MainActivity :
 
                 Scaffold(
                     topBar = {
-                        topBarComponents(scrollBehavior)
+                        TopBarComponents(scrollBehavior)
                     },
                     content = { innerPadding ->
                         NavHost(
@@ -119,7 +128,7 @@ class MainActivity :
                     },
 
                     bottomBar = {
-                        bottomBarComponents(currentDestination, selectedItemIndex, navController)
+                        BottomBarComponents(currentDestination, selectedItemIndex, navController)
                     },
                 )
             }
@@ -128,7 +137,7 @@ class MainActivity :
 
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
-    private fun topBarComponents(scrollBehavior: TopAppBarScrollBehavior) {
+    private fun TopBarComponents(scrollBehavior: TopAppBarScrollBehavior) {
         CenterAlignedTopAppBar(
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -154,7 +163,7 @@ class MainActivity :
     }
 
     @Composable
-    private fun bottomBarComponents(
+    private fun BottomBarComponents(
         currentDestination: NavDestination?,
         selectedItemIndex: Int,
         navController: NavHostController

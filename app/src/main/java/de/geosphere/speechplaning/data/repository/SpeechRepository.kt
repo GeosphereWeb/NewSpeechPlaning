@@ -36,7 +36,7 @@ class SpeechRepository(
                 .await()
             querySnapshot.toObjects(Speech::class.java)
         } catch (e: Exception) {
-            throw RuntimeException("Failed to get active speeches from $SPEECHES_COLLECTION", e)
+            throw RuntimeException("Failed to get active speech from $SPEECHES_COLLECTION", e)
         }
     }
 }
