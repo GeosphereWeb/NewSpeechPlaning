@@ -47,6 +47,7 @@ android {
         jvmTarget = "11"
         freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
     }
+
     buildFeatures {
         compose = true
     }
@@ -64,6 +65,14 @@ android {
         }
     }
 
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            all {
+                it.useJUnitPlatform()
+            }
+        }
+    }
 }
 
 dependencies {
@@ -89,7 +98,7 @@ dependencies {
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
     // Add the dependency for the Realtime Database library
-    // When using the BoM, you don\'t specify versions in Firebase library dependencies
+    // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation(libs.firebase.database)
 
     // // Koin
@@ -100,16 +109,16 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.androidx.ui.test.junit4.android) // Für
 
+    // Unit Tests
     testImplementation(kotlin("test"))
     testImplementation(libs.junit.jupiter.api)
-
-    testImplementation(libs.mockk)
-    testImplementation(libs.mockk.android)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.params)
-    testImplementation(libs.junit.jupiter.api)
+    testImplementation(libs.mockk) {
+        exclude(group = "io.mockk", module = "mockk-android")
+}
+    //testImplementation(libs.mockk.android) // Remove, not needed for pure unit tests
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.junit) // JUnit 4 für backwards compatibility
 
     testRuntimeOnly(libs.junit.jupiter.engine)
 
@@ -125,10 +134,6 @@ dependencies {
 
     detekt(libs.detekt.cli)
     detektPlugins(libs.detekt.formatting)
-
-
-    testRuntimeOnly(libs.junit.jupiter.engine)
-
 }
 
 // INHALT FÜR DIE DUMMY google-services.json

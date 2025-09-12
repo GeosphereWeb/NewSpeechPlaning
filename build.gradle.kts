@@ -4,14 +4,28 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
-// Load coverage exclusion patterns from file
-val coverageExclusionFile = rootProject.file("config/sonar/coverage_exclusions.txt")
-val coverageExclusionPatterns = if (coverageExclusionFile.exists()) {
-    coverageExclusionFile.readLines().filter { it.isNotBlank() }.joinToString(",")
-} else {
-    println("Warning: SonarQube coverage exclusion file not found at ${coverageExclusionFile.absolutePath}. No exclusions will be applied.")
-    "" // Fallback, falls die Datei nicht existiert oder leer ist
+fun loadPatternsFromFile(filePath: String, descriptionForWarning: String): String {
+    val exclusionFile = rootProject.file(filePath) // rootProject is available in this script's scope
+    return if (exclusionFile.exists()) {
+        exclusionFile.readLines().filter { it.isNotBlank() }.joinToString(",")
+    } else {
+        println( // Using println to match the original style
+            "Warning: $descriptionForWarning file not found at ${exclusionFile.absolutePath}. " +
+                "No exclusions will be applied."
+        )
+        "" // Fallback if the file doesn't exist or is empty
+    }
 }
+
+val coverageExclusionPatterns = loadPatternsFromFile(
+    "config/sonar/coverage_exclusions.txt",
+    "SonarQube coverage exclusion"
+)
+
+val duplicationExclusionPatterns = loadPatternsFromFile(
+    "config/sonar/duplication_exclusions.txt",
+    "SonarQube duplication exclusion" // Corrected description
+)
 
 plugins {
     alias(libs.plugins.android.application) apply false
@@ -20,7 +34,7 @@ plugins {
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.ktlint)
     alias(libs.plugins.detekt) apply true
-    id("org.sonarqube") version "6.2.0.5505"
+    alias(libs.plugins.sonarcube) apply true
     alias(libs.plugins.android.library) apply false // Überprüfe die neueste Version
 }
 
@@ -39,19 +53,19 @@ sonarqube {
     properties {
         property("sonar.projectKey", "GeosphereWeb_NewSpeechPlan")
         property("sonar.organization", "geosphereweb")
-        // sonar.host.url wird oft hier gesetzt, kann aber auch in der Action übergeben werden
         property("sonar.host.url", "https://sonarcloud.io")
 
-        // HIER: Datei(en) von der SonarQube-Analyse ausschließen (allgemein)
         property("sonar.exclusions", "**/google-services.json,another/file/to/exclude.java")
-        property("sonar.sourceEncoding", "UTF-8") // Explizit setzen
+        property("sonar.sourceEncoding", "UTF-8")
 
-        // HIER: Quelldateien von der CODE COVERAGE ausschließen (aus Datei geladen)
         if (coverageExclusionPatterns.isNotEmpty()) {
             property("sonar.coverage.exclusions", coverageExclusionPatterns)
         }
 
-        // Pfad zum JaCoCo XML-Report
+        if (duplicationExclusionPatterns.isNotEmpty()) {
+            property("sonar.cpd.exclusions", duplicationExclusionPatterns)
+        }
+
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
             "${project(":app").buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
