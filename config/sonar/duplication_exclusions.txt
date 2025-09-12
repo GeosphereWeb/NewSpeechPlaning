@@ -1,0 +1,1 @@
+**/app/src/main/java/de/geosphere/speechplaning/mockup/**/*.kt
