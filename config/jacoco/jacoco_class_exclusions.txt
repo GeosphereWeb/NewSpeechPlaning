@@ -14,10 +14,10 @@ android/**/*.*
 **/*_Impl.class
 **/*_HiltModules*.*
 de/geosphere/speechplaning/data/model/**/*.class
-de/geosphere/speechplaning/data/repository/**/*.class
 de/geosphere/speechplaning/data/services/**/*.class
 de/geosphere/speechplaning/data/database/**/*.class
 de/geosphere/speechplaning/data/network/**/*.class
 de/geosphere/speechplaning/di/**/*.class
+de/geosphere/speechplaning/mockup/**/*.class
 **/*Activity.class
 **/*Fragment.class

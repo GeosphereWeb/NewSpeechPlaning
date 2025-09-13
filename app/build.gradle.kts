@@ -1,3 +1,4 @@
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import java.util.Locale
 
@@ -285,33 +286,26 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     group = JavaBasePlugin.BUILD_TASK_NAME
     dependsOn("testDebugUnitTest")
 
-    // Definiert, welche Dateitypen im Report einfließen sollen.
     reports {
         xml.required.set(true)
         html.required.set(true)
     }
 
-    // Pfad zu den kompilierten Klassendateien.
-    // Wir schließen alles aus, was von Dagger, Hilt, DataBinding und bestimmten Android-Klassen generiert wird,
-    // da wir diese nicht in unserer Code-Coverage sehen wollen.
-    val classDirs = fileTree("${layout.buildDirectory}/tmp/kotlin-classes/debug") { // <-- Korrigiert
-        exclude(jacocoExclusionPatterns) // Lade Ausschlüsse aus der Liste
-    }
-
-    // Pfad zu den Quellcode-Dateien.
-    val sourceDirs = files("src/main/java", "src/main/kotlin")
-
-    // Setzt die Quell- und Klassendateien für den Report.
-    sourceDirectories.setFrom(sourceDirs)
-    classDirectories.setFrom(classDirs)
-
-    // Wo die .exec-Dateien mit den Coverage-Daten liegen.
-    executionData.setFrom(
-        fileTree(layout.buildDirectory) {
-            include(
-                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
-                "jacoco/testDebugUnitTest.exec" // Fallback-Pfad
-            )
+    // --- Korrektur 1: classDirectories ---
+    val classDirsProvider = layout.buildDirectory.dir("tmp/kotlin-classes/debug")
+    classDirectories.from(
+        files(classDirsProvider).asFileTree.matching {
+            exclude(jacocoExclusionPatterns)
         }
+    )
+
+    // --- Quellverzeichnisse (war schon ok) ---
+    val sourceDirs = files("src/main/java", "src/main/kotlin")
+    sourceDirectories.setFrom(sourceDirs)
+
+    // --- Korrektur 2: executionData ---
+    executionData.from(
+        layout.buildDirectory.file("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"),
+        layout.buildDirectory.file("jacoco/testDebugUnitTest.exec") // Fallback
     )
 }

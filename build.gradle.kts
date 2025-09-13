@@ -66,11 +66,17 @@ sonarqube {
             property("sonar.cpd.exclusions", duplicationExclusionPatterns)
         }
 
-        property(
-            "sonar.coverage.jacoco.xmlReportPaths",
-            "${project(":app").layout.buildDirectory}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+        properties(
+            mapOf(
+                "sonar.coverage.jacoco.xmlReportPaths" to
+                    project(":app").layout.buildDirectory
+                        .file("reports/jacoco/jacocoTestReport/jacocoTestReport.xml").get().asFile.path,
+
+                "sonar.androidLint.reportPaths" to
+                    project(":app").layout.buildDirectory
+                        .file("reports/lint-results.xml").get().asFile.path
+            )
         )
-        property("sonar.androidLint.reportPaths", "${project(":app").layout.buildDirectory}/reports/lint-results.xml")
         property("sonar.gradle.skipCompile", "true")
 
         // Weitere Eigenschaften nach Bedarf (z.B. sonar.sources, sonar.java.binaries, etc.)
